@@ -166,12 +166,16 @@ tbody tr:hover{background:#fafaf7}
 // ============================================================
 // DATA
 // ============================================================
-const BANK_DATA=[{"date":"2026.01.01","amount":1527610,"payer":"조광식","category":"기타","content":"이월금","note":"2025년 이월금","balance":1527610},{"date":"2026.01.01","amount":20000,"payer":"황성진","category":"회비","content":"1월","note":"","balance":1547610},{"date":"2026.01.01","amount":20000,"payer":"박종윤","category":"회비","content":"1월","note":"","balance":1567610},{"date":"2026.01.01","amount":200000,"payer":"위용진","category":"연납","content":"","note":"","balance":1767610},{"date":"2026.01.01","amount":20000,"payer":"최병일","category":"회비","content":"1월","note":"","balance":1787610},{"date":"2026.01.01","amount":200000,"payer":"최재원","category":"연납","content":"","note":"","balance":1987610},{"date":"2026.01.02","amount":200000,"payer":"오승수","category":"연납","content":"","note":"","balance":2187610},{"date":"2026.01.02","amount":200000,"payer":"조광식","category":"연납","content":"","note":"","balance":2387610},{"date":"2026.01.02","amount":200000,"payer":"장현구","category":"연납","content":"","note":"","balance":2587610},{"date":"2026.01.02","amount":200000,"payer":"박형우","category":"연납","content":"","note":"","balance":2787610},{"date":"2026.01.02","amount":200000,"payer":"김나진","category":"연납","content":"","note":"","balance":2987610},{"date":"2026.01.02","amount":200000,"payer":"이우현","category":"연납","content":"","note":"","balance":3187610},{"date":"2026.01.02","amount":20000,"payer":"박동현","category":"회비","content":"","note":"25년 12월","balance":3207610},{"date":"2026.01.02","amount":200000,"payer":"고성범","category":"연납","content":"","note":"","balance":3407610},{"date":"2026.01.02","amount":50000,"payer":"김나진","category":"풋살각출","content":"","note":"","balance":3457610},{"date":"2026.01.02","amount":200000,"payer":"김달","category":"연납","content":"","note":"","balance":3657610},{"date":"2026.01.02","amount":200000,"payer":"이은석","category":"연납","content":"","note":"","balance":3857610},{"date":"2026.01.02","amount":200000,"payer":"고준현","category":"연납","content":"","note":"","balance":4057610},{"date":"2026.01.02","amount":200000,"payer":"정세왕","category":"연납","content":"","note":"","balance":4257610},{"date":"2026.01.04","amount":20000,"payer":"김기택","category":"회비","content":"1월","note":"","balance":4277610},{"date":"2026.01.04","amount":-800000,"payer":"조광식","category":"동구협회관련","content":"26년도 동구협회연납비","note":"","balance":3477610},{"date":"2026.01.05","amount":-5960,"payer":"조광식","category":"물","content":"","note":"","balance":3471650},{"date":"2026.01.05","amount":20000,"payer":"오형래","category":"회비","content":"1월","note":"","balance":3491650},{"date":"2026.01.06","amount":180000,"payer":"박종윤","category":"연납","content":"","note":"","balance":3671650},{"date":"2026.01.06","amount":120000,"payer":"나민수","category":"연납","content":"","note":"전년도 회비입금초과 8만원으로 12만원 추가 입금","balance":3791650},{"date":"2026.01.07","amount":200000,"payer":"김형준","category":"연납","content":"","note":"","balance":3991650},{"date":"2026.01.07","amount":-150000,"payer":"조광식","category":"비품","content":"축구공구입","note":"","balance":3841650},{"date":"2026.01.08","amount":200000,"payer":"송재홍","category":"연납","content":"","note":"","balance":4041650},{"date":"2026.01.09","amount":-100000,"payer":"조광식","category":"동구협회관련","content":"안전기원제 찬조금","note":"","balance":3941650},{"date":"2026.01.09","amount":200000,"payer":"박성준","category":"연납","content":"","note":"","balance":4141650},{"date":"2026.01.09","amount":20000,"payer":"박은성","category":"회비","content":"1월","note":"","balance":4161650},{"date":"2026.01.10","amount":200000,"payer":"현성주","category":"연납","content":"","note":"","balance":4361650},{"date":"2026.01.12","amount":72,"payer":"조광식","category":"이자","content":"","note":"","balance":4361722},{"date":"2026.01.12","amount":20000,"payer":"최민재","category":"회비","content":"1월","note":"","balance":4381722},{"date":"2026.01.13","amount":200000,"payer":"배기호","category":"연납","content":"","note":"","balance":4581722},{"date":"2026.01.13","amount":200000,"payer":"강영승","category":"연납","content":"","note":"","balance":4781722},{"date":"2026.01.13","amount":-120000,"payer":"조광식","category":"풋살대관","content":"풋살(1/15)","note":"","balance":4661722},{"date":"2026.01.14","amount":20000,"payer":"정영창","category":"회비","content":"1월","note":"","balance":4681722},{"date":"2026.01.17","amount":200000,"payer":"고경범","category":"연납","content":"","note":"","balance":4881722},{"date":"2026.01.19","amount":40000,"payer":"양승진","category":"회비","content":"1월","note":"2025년 12월 포함","balance":4921722},{"date":"2026.01.22","amount":-80000,"payer":"조광식","category":"운동장대관","content":"02/20 율도 대관비","note":"","balance":4841722},{"date":"2026.01.22","amount":-8000,"payer":"조광식","category":"운동장대관","content":"02/23 율도대관비 취소 수수료","note":"","balance":4833722},{"date":"2026.01.22","amount":-80000,"payer":"조광식","category":"운동장대관","content":"02/24 율도 대관비","note":"","balance":4753722},{"date":"2026.01.22","amount":-102500,"payer":"조광식","category":"운동장대관","content":"02/26 중구 대관비","note":"","balance":4651222},{"date":"2026.01.22","amount":-70000,"payer":"조광식","category":"운동장대관","content":"02/23 동구 대관비","note":"","balance":4581222},{"date":"2026.01.22","amount":88000,"payer":"조광식","category":"운동장대관","content":"02/24 송림FC 입금","note":"","balance":4669222},{"date":"2026.01.24","amount":171,"payer":"조광식","category":"이자","content":"","note":"","balance":4669393},{"date":"2026.01.26","amount":200000,"payer":"이상열","category":"연납","content":"","note":"","balance":4869393},{"date":"2026.01.26","amount":-17880,"payer":"조광식","category":"물","content":"(주)와마트(지점) 물","note":"","balance":4851513},{"date":"2026.01.27","amount":200000,"payer":"지덕만","category":"연납","content":"","note":"","balance":5051513},{"date":"2026.01.27","amount":-91500,"payer":"조광식","category":"비품","content":"조끼 결제","note":"","balance":4960013},{"date":"2026.01.28","amount":-35000,"payer":"조광식","category":"매치비용","content":"매치비용 한레블FC","note":"","balance":4925013},{"date":"2026.01.30","amount":200000,"payer":"채인선","category":"연납","content":"","note":"","balance":5125013},{"date":"2026.01.30","amount":200000,"payer":"곽경민","category":"연납","content":"","note":"","balance":5325013},{"date":"2026.01.30","amount":200000,"payer":"김진태","category":"연납","content":"","note":"","balance":5525013},{"date":"2026.01.30","amount":20000,"payer":"박준수","category":"회비","content":"1월","note":"","balance":5545013},{"date":"2026.01.30","amount":20000,"payer":"김복락","category":"회비","content":"1월","note":"","balance":5565013},{"date":"2026.01.30","amount":20000,"payer":"송승렬","category":"회비","content":"1월","note":"","balance":5585013},{"date":"2026.01.31","amount":20000,"payer":"김성훈","category":"회비","content":"1월","note":"","balance":5605013},{"date":"2026.01.31","amount":200000,"payer":"박준","category":"연납","content":"","note":"","balance":5805013},{"date":"2026.01.31","amount":20000,"payer":"윤승원","category":"회비","content":"1월","note":"","balance":5825013},{"date":"2026.01.31","amount":200000,"payer":"신언호","category":"연납","content":"","note":"","balance":6025013},{"date":"2026.01.31","amount":200000,"payer":"김동규","category":"연납","content":"","note":"","balance":6225013},{"date":"2026.01.31","amount":200000,"payer":"김민범","category":"연납","content":"","note":"","balance":6425013},{"date":"2026.02.01","amount":20000,"payer":"황성진","category":"회비","content":"2월","note":"","balance":6445013},{"date":"2026.02.01","amount":20000,"payer":"박동현","category":"회비","content":"1월","note":"","balance":6465013},{"date":"2026.02.01","amount":200000,"payer":"김한기","category":"연납","content":"","note":"","balance":6665013},{"date":"2026.02.01","amount":-140000,"payer":"조광식","category":"운동장대관","content":"동구대관비(2월)","note":"","balance":6525013},{"date":"2026.02.01","amount":20000,"payer":"정찬","category":"회비","content":"1월","note":"","balance":6545013},{"date":"2026.02.01","amount":40000,"payer":"명순주","category":"회비","content":"1,2월","note":"","balance":6585013},{"date":"2026.02.01","amount":40000,"payer":"김준기","category":"회비","content":"1,2월","note":"","balance":6625013},{"date":"2026.02.01","amount":-140000,"payer":"조광식","category":"운동장대관","content":"동구대관비(2월-수요일)","note":"","balance":6485013},{"date":"2026.02.02","amount":20000,"payer":"박준수","category":"회비","content":"2월","note":"","balance":6505013},{"date":"2026.02.02","amount":40000,"payer":"강지중","category":"회비","content":"1,2월","note":"","balance":6545013},{"date":"2026.02.04","amount":40000,"payer":"정성민","category":"회비","content":"1,2월","note":"","balance":6585013},{"date":"2026.02.04","amount":-39000,"payer":"조광식","category":"유니폼관련","content":"이준희 3xl","note":"","balance":6546013},{"date":"2026.02.05","amount":-11920,"payer":"조광식","category":"물","content":"","note":"","balance":6534093},{"date":"2026.02.07","amount":20000,"payer":"양승진","category":"회비","content":"2월","note":"","balance":6554093},{"date":"2026.02.10","amount":20000,"payer":"박은성","category":"회비","content":"2월","note":"","balance":6574093},{"date":"2026.02.10","amount":48,"payer":"조광식","category":"이자","content":"","note":"","balance":6574141},{"date":"2026.02.10","amount":40000,"payer":"최병일","category":"회비","content":"2,3월","note":"","balance":6614141},{"date":"2026.02.10","amount":20000,"payer":"오형래","category":"회비","content":"2월","note":"","balance":6634141},{"date":"2026.02.10","amount":20000,"payer":"정영창","category":"회비","content":"2월","note":"","balance":6654141},{"date":"2026.02.16","amount":40000,"payer":"김태훈","category":"매치비용","content":"PCY 매치비용","note":"","balance":6694141},{"date":"2026.02.20","amount":-5960,"payer":"조광식","category":"물","content":"","note":"","balance":6688181},{"date":"2026.02.21","amount":-70000,"payer":"조광식","category":"운동장대관","content":"동구 3/9","note":"","balance":6618181},{"date":"2026.02.21","amount":-70000,"payer":"조광식","category":"운동장대관","content":"동구 3/23","note":"","balance":6548181},{"date":"2026.02.21","amount":-80000,"payer":"조광식","category":"운동장대관","content":"율도 3/23","note":"","balance":6468181},{"date":"2026.02.21","amount":-102500,"payer":"조광식","category":"운동장대관","content":"중구 3/5","note":"","balance":6365681},{"date":"2026.02.23","amount":-14900,"payer":"조광식","category":"물","content":"","note":"","balance":6350781},{"date":"2026.02.25","amount":51250,"payer":"조광식","category":"매치비용","content":"아라FC 매치비용","note":"","balance":6402031},{"date":"2026.02.25","amount":20000,"payer":"윤승원","category":"회비","content":"2월","note":"","balance":6422031},{"date":"2026.02.25","amount":20000,"payer":"송승렬","category":"회비","content":"2월","note":"","balance":6442031},{"date":"2026.02.25","amount":20000,"payer":"최민재","category":"회비","content":"2월","note":"","balance":6462031},{"date":"2026.02.25","amount":20000,"payer":"김복락","category":"회비","content":"2월","note":"","balance":6482031},{"date":"2026.02.25","amount":40000,"payer":"김기택","category":"회비","content":"2월,4월 / 3월 파견","note":"","balance":6522031},{"date":"2026.02.26","amount":-230000,"payer":"조광식","category":"운동장대관","content":"3월","note":"","balance":6292031},{"date":"2026.02.27","amount":200000,"payer":"유도규","category":"연납","content":"","note":"","balance":6492031},{"date":"2026.02.28","amount":20000,"payer":"박동현","category":"회비","content":"2월","note":"","balance":6512031},{"date":"2026.02.29","amount":20000,"payer":"김성훈","category":"회비","content":"2월","note":"","balance":6532031},{"date":"2026.02.27","amount":40000,"payer":"정찬","category":"회비","content":"2. 3월","note":"","balance":6572031},{"date":"2026.02.28","amount":90,"payer":"조광식","category":"이자","content":"","note":"","balance":6572121},{"date":"2026.02.28","amount":20000,"payer":"양승진","category":"회비","content":"3월","note":"","balance":6592121},{"date":"2026.02.28","amount":6739,"payer":"조광식","category":"이자","content":"세이프박스이자","note":"","balance":6598860},{"date":"2026.03.01","amount":20000,"payer":"황성진","category":"회비","content":"3월","note":"","balance":6618860},{"date":"2026.03.01","amount":20000,"payer":"최민재","category":"회비","content":"3월","note":"","balance":6638860},{"date":"2026.03.07","amount":20000,"payer":"정영창","category":"회비","content":"3월","note":"","balance":6658860},{"date":"2026.03.09","amount":-29800,"payer":"조광식","category":"물","content":"","note":"","balance":6629060},{"date":"2026.03.10","amount":-43000,"payer":"조광식","category":"비품","content":"골키퍼장갑2개","note":"","balance":6586060},{"date":"2026.03.10","amount":12,"payer":"조광식","category":"이자","content":"체크카드 캐시백","note":"","balance":6586072},{"date":"2026.03.10","amount":20000,"payer":"박은성","category":"회비","content":"3월","note":"","balance":6606072}];
+const BANK_DATA=[];
 
-const MEMBER_DATA=[{"group":0,"position":"회장","name":"이상열","jersey":29,"year":1982,"age":44,"contact":"010-6712-2924","annual_date":"2026-01-26","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":1,"position":"부회장","name":"김민범","jersey":99,"year":1983,"age":43,"contact":"010-9173-7065","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":2,"position":"감독","name":"김동규","jersey":8,"year":1986,"age":40,"contact":"010-3934-2540","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"강영승","jersey":24,"year":1974,"age":52,"contact":"010-8864-6065","annual_date":"2026-01-13","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"김진태","jersey":11,"year":1976,"age":50,"contact":"010-4913-2217","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"채인선","jersey":14,"year":1978,"age":48,"contact":"010-9113-2522","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"총무","name":"조광식","jersey":35,"year":1988,"age":38,"contact":"010-4817-9180","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"부총무","name":"최재원","jersey":58,"year":1993,"age":33,"contact":"010-8181-7421","annual_date":"2026-01-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"간사","name":"위용진","jersey":88,"year":1987,"age":39,"contact":"010-6324-6788","annual_date":"2026-01-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"신언호","jersey":50,"year":1987,"age":39,"contact":"010-2831-1730","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"유도규","jersey":30,"year":1987,"age":39,"contact":"010-9929-2148","annual_date":"2026-02-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"정영창","jersey":84,"year":1984,"age":42,"contact":"010-6263-0935","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"강지중","jersey":17,"year":1994,"age":32,"contact":"010-4125-2318","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고경범","jersey":54,"year":1992,"age":34,"contact":"010-4791-0907","annual_date":"2026-01-17","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고성범","jersey":95,"year":1995,"age":31,"contact":"010-8469-4700","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고준현","jersey":3,"year":1989,"age":37,"contact":"010-8931-3779","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"곽경민","jersey":77,"year":1999,"age":27,"contact":"010-2272-7705","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김기택","jersey":12,"year":2001,"age":25,"contact":"010-3099-9297","annual_date":"","m1":"O","m2":"O","m3":"파견","m4":"O","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김나진","jersey":16,"year":1994,"age":32,"contact":"010-3783-6667","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김달","jersey":65,"year":1991,"age":35,"contact":"010-7685-8765","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김복락","jersey":31,"year":1989,"age":37,"contact":"010-8619-3328","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김성훈","jersey":74,"year":1988,"age":38,"contact":"010-8925-3704","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김준기","jersey":91,"year":1991,"age":35,"contact":"010-5550-3996","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김한기","jersey":80,"year":1990,"age":36,"contact":"010-3565-9527","annual_date":"2026-02-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김형준","jersey":97,"year":1997,"age":29,"contact":"010-9341-4825","annual_date":"2026-01-07","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"나민수","jersey":21,"year":1992,"age":34,"contact":"010-2813-7446","annual_date":"2026-01-06","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"명순주","jersey":87,"year":1987,"age":39,"contact":"010-4021-0327","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박동현","jersey":93,"year":1993,"age":33,"contact":"010-2103-5393","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박성준","jersey":7,"year":1994,"age":32,"contact":"010-6677-3172","annual_date":"2026-01-09","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박은성","jersey":22,"year":2002,"age":24,"contact":"010-2477-4434","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박종윤","jersey":39,"year":1988,"age":38,"contact":"010-4815-1497","annual_date":"2026-01-06","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박준","jersey":28,"year":1998,"age":28,"contact":"010-4489-7677","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박준수","jersey":96,"year":1996,"age":30,"contact":"010-8138-2584","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박형우","jersey":61,"year":1980,"age":46,"contact":"010-6852-4087","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"배기호","jersey":4,"year":1995,"age":31,"contact":"010-4787-5790","annual_date":"2026-01-13","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"송승렬","jersey":98,"year":1998,"age":28,"contact":"010-2449-1462","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"송재홍","jersey":25,"year":1991,"age":35,"contact":"010-5678-0449","annual_date":"2026-01-08","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"양승진","jersey":60,"year":1986,"age":40,"contact":"010-7794-8090","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"오승수","jersey":23,"year":1991,"age":35,"contact":"010-3231-1505","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"오형래","jersey":26,"year":1991,"age":35,"contact":"010-8695-8982","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"윤승원","jersey":76,"year":2001,"age":25,"contact":"010-9464-3299","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이우현","jersey":69,"year":1990,"age":36,"contact":"010-8960-9650","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이은석","jersey":41,"year":1998,"age":28,"contact":"010-2070-6284","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이준희","jersey":71,"year":1987,"age":39,"contact":"010-5681-1123","annual_date":"2026-02-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이학주","jersey":5,"year":1985,"age":41,"contact":"010-8837-1051","annual_date":"","m1":"","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"장현구","jersey":44,"year":1984,"age":42,"contact":"010-9195-5009","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정성민","jersey":15,"year":1995,"age":31,"contact":"010-5858-9524","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정세왕","jersey":90,"year":1990,"age":36,"contact":"010-3316-7179","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정찬","jersey":66,"year":2001,"age":25,"contact":"010-4812-2797","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"지덕만","jersey":1,"year":1982,"age":44,"contact":"010-2636-1100","annual_date":"2026-01-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"최민재","jersey":34,"year":1997,"age":29,"contact":"010-6847-6454","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"최병일","jersey":9,"year":1986,"age":40,"contact":"010-8884-4703","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"현성주","jersey":6,"year":1990,"age":36,"contact":"010-5847-9852","annual_date":"2026-01-10","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"황성진","jersey":13,"year":1982,"age":44,"contact":"010-2546-8680","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":7,"position":"회원","name":"김동연","jersey":47,"year":2001,"age":25,"contact":"010-3918-4077","annual_date":"해외출장","m1":"해외출장","m2":"해외출장","m3":"해외출장","m4":"해외출장","m5":"해외출장","m6":"해외출장","m7":"해외출장","m8":"해외출장","m9":"해외출장","m10":"해외출장","m11":"해외출장","m12":"해외출장"},{"group":7,"position":"회원","name":"김승현","jersey":19,"year":1992,"age":34,"contact":"010-5550-0441","annual_date":"부상","m1":"부상","m2":"부상","m3":"부상","m4":"부상","m5":"부상","m6":"부상","m7":"부상","m8":"부상","m9":"부상","m10":"부상","m11":"부상","m12":"부상"},{"group":7,"position":"회원","name":"남은석","jersey":42,"year":2001,"age":25,"contact":"010-8561-4384","annual_date":"군대","m1":"군대","m2":"군대","m3":"군대","m4":"군대","m5":"군대","m6":"군대","m7":"군대","m8":"군대","m9":"군대","m10":"군대","m11":"군대","m12":"군대"},{"group":7,"position":"회원","name":"윤성호","jersey":33,"year":1992,"age":34,"contact":"010-6424-6277","annual_date":"부상","m1":"부상","m2":"부상","m3":"부상","m4":"부상","m5":"부상","m6":"부상","m7":"부상","m8":"부상","m9":"부상","m10":"부상","m11":"부상","m12":"부상"},{"group":7,"position":"회원","name":"천정훈","jersey":2,"year":1995,"age":31,"contact":"010-7551-6707","annual_date":"육아","m1":"육아","m2":"육아","m3":"육아","m4":"육아","m5":"육아","m6":"육아","m7":"육아","m8":"육아","m9":"육아","m10":"육아","m11":"육아","m12":"육아"}];
+const MEMBER_DATA=[];
 
 const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-const CATS=[...new Set(BANK_DATA.map(t=>t.category))];
+function getCATS(){
+  const counts={};
+  BANK_DATA.forEach(t=>{if(t.category)counts[t.category]=(counts[t.category]||0)+1;});
+  return Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+}
 const fmt=n=>Number(n).toLocaleString('ko-KR');
 
 // 탈퇴회원 데이터
@@ -186,7 +190,7 @@ function showToast(msg,dur=2800){
 // ============================================================
 // STATE
 // ============================================================
-let state={tab:'bank',search:'',catFilter:'전체',monthFilter:'전체',rptStart:'2026-01-01',rptEnd:'2026-03-10',memberSubTab:'active',memberSort:'seq',backNumbers:[],donations:[]};
+let state={tab:'bank',search:'',catFilter:'전체',monthFilter:'전체',rptStart:'2026-01-01',rptEnd:'2026-03-10',memberSubTab:'active',memberSort:'seq',bankSort:'desc',backNumbers:[],donations:[]};
 
 // 검색: keyup에서만 실행, 한글 조합중(composing)엔 완전히 무시
 let _isComposing=false;
@@ -206,7 +210,8 @@ function getStats(){
 }
 
 function getFiltered(){
-  return [...BANK_DATA].reverse().filter(t=>{
+  const arr=state.bankSort==='asc'?[...BANK_DATA]:[...BANK_DATA].reverse();
+  return arr.filter(t=>{
     if(state.catFilter!=='전체'&&t.category!==state.catFilter)return false;
     if(state.monthFilter!=='전체'){
       const m=parseInt(t.date.split('.')[1]);
@@ -252,7 +257,7 @@ function getReport(){
   const s=state.rptStart.replace(/-/g,'.');
   const e=state.rptEnd.replace(/-/g,'.');
 
-  // 시스템 제외, 기간 필터
+  // 시스템 제외, 기간 필터 (표시용)
   const filtered=BANK_DATA.filter(t=>
     t.date>=s && t.date<=e && t.payer!=='시스템'
   );
@@ -260,8 +265,8 @@ function getReport(){
   const income={},expense={};
   let totalIn=0,totalOut=0;
 
-  // 4. 시작일 전날 잔액 → 이월잔액으로 수입에 추가
-  const prevTx=BANK_DATA.filter(t=>t.date<s && t.payer!=='시스템');
+  // 시작일 이전 마지막 잔액 — 시스템 포함해서 실제 잔액 기준으로
+  const prevTx=BANK_DATA.filter(t=>t.date<s);
   if(prevTx.length>0){
     const prevBal=prevTx[prevTx.length-1].balance;
     if(prevBal!==0){
@@ -269,11 +274,7 @@ function getReport(){
       if(!income[syntheticCat])income[syntheticCat]={total:0,items:[]};
       const abs=Math.abs(prevBal);
       income[syntheticCat].total+=abs;
-      income[syntheticCat].items.push({
-        date:s, amount:prevBal, payer:'', category:syntheticCat,
-        content:`시작일(${s}) 전일 잔액`, note:'', abs,
-        _synthetic:true
-      });
+      income[syntheticCat].items.push({date:s,amount:prevBal,payer:'',category:syntheticCat,content:'',note:'',abs,_synthetic:true});
       totalIn+=abs;
     }
   }
@@ -283,11 +284,21 @@ function getReport(){
     const cat=t.category||'기타';
     if(!g[cat])g[cat]={total:0,items:[]};
     const abs=Math.abs(t.amount);
-    g[cat].total+=abs;g[cat].items.push({...t,abs});
+    g[cat].total+=abs;g[cat].items.push({...t,abs,_orig:t});
     if(t.amount>=0)totalIn+=abs;else totalOut+=abs;
   });
 
-  return{income,expense,totalIn,totalOut,balance:totalIn-totalOut,count:filtered.length};
+  // 잔액은 BANK_DATA 기준 실제값 (시스템 거래 포함)
+  const endTx=BANK_DATA.filter(t=>t.date<=e);
+  const realBalance=endTx.length>0?endTx[endTx.length-1].balance:0;
+
+  // donations 기간 필터
+  const donations=(state.donations||[]).filter(d=>{
+    const dd=d.date.replace(/-/g,'.');
+    return dd>=s&&dd<=e;
+  });
+
+  return{income,expense,totalIn,totalOut,balance:realBalance,count:filtered.length,donations};
 }
 
 function getMonthlyChart(){
@@ -323,7 +334,7 @@ function monthCell(m,val){
 function renderBankPage(){
   const stats=getStats();
   const filtered=getFiltered();
-  const allCats=['전체',...CATS];
+  const allCats=['전체',...getCATS()];
   const allMonths=['전체','1','2','3','4','5','6','7','8','9','10','11','12'];
   return `
     <div class="stats">
@@ -369,7 +380,9 @@ function renderBankPage(){
             <col style="width:5%">
           </colgroup>
           <thead><tr>
-            <th style="white-space:normal">날짜</th>
+            <th style="white-space:normal;cursor:pointer;user-select:none" onclick="state.bankSort=state.bankSort==='desc'?'asc':'desc';render()">
+              날짜 ${state.bankSort==='desc'?'↓':'↑'}
+            </th>
             <th style="white-space:normal;text-align:center">이름</th>
             <th style="white-space:normal;text-align:center">구분</th>
             <th style="white-space:normal;text-align:center">내용</th>
@@ -451,27 +464,17 @@ function renderDuesPage(){
               MONTHS.map((_,i)=>monthCell(i+1,m['m'+(i+1)])).join('')}</div>
           </div>`;
         }).join('')}
-        </div><!-- /duesExportArea -->
-      </div>
-    </div>
-    ${inactive.length>0?`
-    <div class="card" style="opacity:.8;margin-top:.5rem">
-      <div class="card-hd" style="background:#f5f5f5"><h2 style="color:var(--text3);font-size:.88rem">비활동 회원 (${inactive.length}명)</h2></div>
-      <div class="card-bd" style="padding:.75rem">
-        <div class="dues-row" style="border-bottom:2px solid var(--border)">
-          <div class="dues-name" style="font-size:.7rem;color:var(--text3);font-weight:400">이름</div>
-          <div class="dues-pos" style="font-size:.65rem;color:var(--text3)">직책</div>
-          <div class="dues-contact" style="font-size:.65rem;color:var(--text3)">연락처</div>
-          <div class="dues-grid">${MONTHS.map(mn=>`<div class="mc mc-hd">${mn}</div>`).join('')}</div>
-        </div>
+        ${inactive.length>0?`
+        <div style="margin-top:.4rem;padding:.2rem .4rem;background:#f0e6f8;border-radius:4px;font-size:.68rem;font-weight:700;color:#6a1b9a">비활동 회원</div>
         ${inactive.map(m=>`<div class="dues-row" style="opacity:.6">
           <div class="dues-name">${m.name}</div>
           <div class="dues-pos">${m.position}</div>
           <div class="dues-contact">${m.contact}</div>
           <div class="dues-grid"><div class="ann-bar" style="background:#f3e5f5;color:#6a1b9a">${getInactiveReason(m)}</div></div>
-        </div>`).join('')}
+        </div>`).join('')}`:''}
+        </div><!-- /duesExportArea -->
       </div>
-    </div>`:''}`;
+    </div>`;
 }
 
 function renderReportPage(){
@@ -497,16 +500,17 @@ function renderReportPage(){
 
       if(isMerge){
         const total=g.items.reduce((s,t)=>s+t.abs,0);
-        const origIdxList=g.items.map(t=>BANK_DATA.indexOf(t));
+        const origIdxList=g.items.map(t=>BANK_DATA.indexOf(t._orig||t));
         rows+=`<tr>
-          <td style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>
+          <td style="font-weight:700;vertical-align:middle;text-align:center;cursor:cell" ondblclick="editReportCat(event,${JSON.stringify(origIdxList).replace(/"/g,"'")})">${cat}</td>
           <td></td>
           <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${JSON.stringify(origIdxList).replace(/"/g,"'")},'amount',${isInc})">${fmt(total)}원</td>
         </tr>`;
       } else if(isDate){
         g.items.forEach((item,i)=>{
-          const origIdx=BANK_DATA.indexOf(item);
-          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>`:''}
+          const origIdx=BANK_DATA.indexOf(item._orig||item);
+          const idxList=g.items.map(t=>BANK_DATA.indexOf(t._orig||t));
+          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center;cursor:cell" ondblclick="editReportCat(event,${JSON.stringify(idxList).replace(/"/g,"'")})">${cat}</td>`:''}
             <td style="text-align:center" ondblclick="editReportCell(event,${origIdx},'content',${isInc})">${item.date||''}</td>
             <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${origIdx},'amount',${isInc})">${fmt(item.abs)}원</td>
           </tr>`;
@@ -520,9 +524,10 @@ function renderReportPage(){
         });
       } else {
         g.items.forEach((item,i)=>{
-          const origIdx=BANK_DATA.indexOf(item);
+          const origIdx=BANK_DATA.indexOf(item._orig||item);
+          const idxList=g.items.map(t=>BANK_DATA.indexOf(t._orig||t));
           const label=item.content||cat;
-          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>`:''}
+          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center;cursor:cell" ondblclick="editReportCat(event,${JSON.stringify(idxList).replace(/"/g,"'")})">${cat}</td>`:''}
             <td style="text-align:center" ondblclick="editReportCell(event,${origIdx},'content',${isInc})">${label}</td>
             <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${origIdx},'amount',${isInc})">${fmt(item.abs)}원</td>
           </tr>`;
@@ -627,9 +632,30 @@ function editReportCell(e, idxOrList, field, isInc){
   inp.addEventListener('blur',commit);
 }
 
-// ============================================================
-// 회비납부 팝업 (통장내역에서 이름 클릭)
-// ============================================================
+// 보고서 항목(카테고리) 더블클릭 수정 — 그룹 전체 category 변경
+function editReportCat(e, idxList){
+  const td=e.currentTarget;
+  if(td.querySelector('input'))return;
+  const firstRow=BANK_DATA[idxList[0]];
+  if(!firstRow)return;
+  const inp=document.createElement('input');
+  inp.type='text';
+  inp.value=firstRow.category||'';
+  inp.style.cssText='width:100%;font-size:.8rem;border:1px solid var(--primary);border-radius:3px;padding:.15rem .3rem;box-sizing:border-box;font-weight:700;text-align:center';
+  const orig=td.innerHTML;
+  td.innerHTML='';td.appendChild(inp);inp.focus();inp.select();
+  const commit=()=>{
+    const val=inp.value.trim();
+    if(val){
+      idxList.forEach(i=>{if(BANK_DATA[i])BANK_DATA[i].category=val;});
+    }
+    render();
+  };
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();commit();}if(ev.key==='Escape')td.innerHTML=orig;});
+  inp.addEventListener('blur',commit);
+}
+
+
 function showDuesPopup(name){
   const member=MEMBER_DATA.find(m=>m.name===name);
   if(!member){return;}
@@ -1000,8 +1026,12 @@ async function saveJerseyToSheet(){
   showToast('📤 등번호 저장 중...');
   try{
     const rows=sorted.map(j=>[j.name, j.jersey]);
-    const res=await gasGetSave('saveBackNumber',{rows});
-    showToast('✅ '+(res.msg||'등번호 저장 완료')+' ('+rows.length+'건)');
+    const jsonBody = JSON.stringify({rows});
+    const url = GAS_URL + '?action=saveBackNumber&payload=' + encodeURIComponent(jsonBody);
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if(!data.ok) throw new Error(data.msg||'알 수 없는 오류');
+    showToast('✅ '+(data.msg||'등번호 저장 완료')+' ('+rows.length+'건)');
   }catch(e){showToast('❌ 저장 실패: '+e.message);}
 }
 
@@ -1185,7 +1215,7 @@ function editPositionCell(e, idx){
 // 통장 내역 추가 모달
 // ============================================================
 function renderAddModal(){
-  const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+  const cats=getCATS();
   return `
   <div id="addModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeAddModal()">
     <div class="modal" style="max-width:520px">
@@ -1348,8 +1378,9 @@ function submitAddModal(){
   BANK_DATA.push({date:dateFmt,amount,payer,category,content,note,balance:newBal});
   calcDuesFromBank();
   closeAddModal();
-  showToast(`✅ 내역이 추가되었습니다 (잔액: ${fmt(newBal)}원)`);
+  showToast(`✅ 내역 추가 완료 (잔액: ${fmt(newBal)}원)`);
   render();
+  if(_accessToken) saveBankbookToSheet();
 }
 
 // ── 삭제
@@ -1365,6 +1396,7 @@ function deleteRow(idx){
   calcDuesFromBank();
   showToast('🗑 내역이 삭제됐어요');
   render();
+  if(_accessToken) saveBankbookToSheet();
 }
 
 // ── 일괄 추가
@@ -1383,7 +1415,7 @@ function closeBulkModal(){
   if(m)m.style.display='none';
 }
 function addBulkRow(){
-  const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+  const cats=getCATS();
   const today=new Date().toISOString().slice(0,10).replace(/-/g,'.');
   const div=document.createElement('div');
   div.className='bulk-row';
@@ -1485,6 +1517,7 @@ function submitBulkModal(){
   closeBulkModal();
   showToast(`✅ ${added}건 추가됐어요 (잔액: ${fmt(lastBal)}원)`);
   render();
+  if(_accessToken) saveBankbookToSheet();
 }
 
 // ============================================================
@@ -1582,7 +1615,7 @@ function editCell(e, idx, field){
 
   let el;
   if(field==='category'){
-    const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+    const cats=getCATS();
     el=document.createElement('select');
     el.style.cssText='width:100%;font-size:.8rem;border:1px solid var(--primary);border-radius:3px;padding:.1rem';
     cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===cur)o.selected=true;el.appendChild(o);});
@@ -1634,12 +1667,11 @@ function copyReport(){
   if(!target){showToast('보고서 영역을 찾을 수 없습니다');return;}
   if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중...');return;}
   showToast('캡처 중...');
-  html2canvas(target,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
+  html2canvas(target,{scale:2,backgroundColor:'#ffffff',useCORS:true,x:-16,y:-12,width:target.offsetWidth+32,height:target.offsetHeight+24}).then(canvas=>{
     canvas.toBlob(blob=>{
       try{
         navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>showToast('📋 클립보드에 복사됐어요! 카톡에 붙여넣기 하세요'));
       }catch(e){
-        // fallback: 다운로드
         const a=document.createElement('a');
         a.download='넉살FC_예산보고서.png';
         a.href=canvas.toDataURL('image/png');
@@ -1708,7 +1740,7 @@ function renderChart(){
 // ============================================================
 // GOOGLE APPS SCRIPT (GAS) 연동
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyt7kHEt3y6bOTnnoGk6FVVzi1fjrma-HCMYXKhdUwZ7U7nt3nkdkGbNZRgPidIjYpl/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxRwtmvMmWFJO7lEZ50G331L0gNsL2oX06smi0G712M8cusYT2InBlJiFNAqiRI-A1j/exec';
 const APP_PASSWORD = '880424';
 let _gsConnected = false;
 let _accessToken = false;
@@ -1740,7 +1772,7 @@ async function gasPost(action, body) {
 
 // ── 등번호 전용 GET 저장 (데이터 작아서 URL에 담기 가능)
 async function gasGetSave(action, body) {
-  const jsonBody = JSON.stringify({ action, ...body });
+  const jsonBody = JSON.stringify({ ...body });
   const url = GAS_URL + '?action=' + encodeURIComponent(action) + '&payload=' + encodeURIComponent(jsonBody);
   const resp = await fetch(url);
   const data = await resp.json();
