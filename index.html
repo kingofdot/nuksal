@@ -1378,6 +1378,7 @@ function submitAddModal(){
   BANK_DATA.push({date:dateFmt,amount,payer,category,content,note,balance:newBal});
   calcDuesFromBank();
   closeAddModal();
+  logAction('통장내역 추가', `${payer} ${category} ${fmt(amount)}원`);
   showToast(`✅ 내역 추가 완료 (잔액: ${fmt(newBal)}원)`);
   render();
   if(_accessToken) saveBankbookToSheet();
@@ -1394,6 +1395,7 @@ function deleteRow(idx){
     bal=BANK_DATA[i].balance;
   }
   calcDuesFromBank();
+  logAction('통장내역 삭제', `${BANK_DATA[idx]?.payer||''}`);
   showToast('🗑 내역이 삭제됐어요');
   render();
   if(_accessToken) saveBankbookToSheet();
@@ -1740,7 +1742,7 @@ function renderChart(){
 // ============================================================
 // GOOGLE APPS SCRIPT (GAS) 연동
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxRwtmvMmWFJO7lEZ50G331L0gNsL2oX06smi0G712M8cusYT2InBlJiFNAqiRI-A1j/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwt0CV154uWmfD1uzubv5QpfT5DvOBOdPEEH4dOFMgNDrIwvUvmmL6xPRfiZ2k7WL-i/exec';
 const APP_PASSWORD = '880424';
 let _gsConnected = false;
 let _accessToken = false;
@@ -1850,6 +1852,7 @@ async function loadAllFromSheets() {
     _gsConnected = true;
     _accessToken = true;
     hideLoading();
+    logAction('데이터 로드', `통장 ${BANK_DATA.length}건 / 회원 ${MEMBER_DATA.length}명`);
     render();
     showToast('✅ 동기화 완료!');
   } catch(e) {
@@ -2092,15 +2095,149 @@ function showPasswordScreen() {
   setTimeout(() => { const el = document.getElementById('pwInput'); if (el) el.focus(); }, 100);
 }
 
+// ============================================================
+// 기기 인증 & 로그 시스템
+// ============================================================
+
+function getDeviceId() {
+  let id = localStorage.getItem('nukssal_device_id');
+  if (!id) {
+    id = 'dev_' + Date.now() + '_' + Math.random().toString(36).slice(2,9);
+    localStorage.setItem('nukssal_device_id', id);
+  }
+  return id;
+}
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua);
+  const type = isTablet ? '태블릿' : isMobile ? '모바일' : 'PC';
+  let browser = '기타';
+  if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) browser = 'Chrome';
+  else if (/Safari/i.test(ua)) browser = 'Safari';
+  else if (/Firefox/i.test(ua)) browser = 'Firefox';
+  else if (/Edge/i.test(ua)) browser = 'Edge';
+  return { type, browser, ua: ua.slice(0,80) };
+}
+
+function getTimeStr() {
+  return new Date().toLocaleString('ko-KR', {timeZone:'Asia/Seoul'});
+}
+
+// 행동 로그 전송 (비동기, 실패해도 무시)
+function logAction(action, detail='') {
+  try {
+    const info = getDeviceInfo();
+    const payload = JSON.stringify({
+      time: getTimeStr(),
+      deviceId: getDeviceId(),
+      deviceType: info.type,
+      browser: info.browser,
+      action, detail
+    });
+    fetch(GAS_URL + '?action=log&payload=' + encodeURIComponent(payload)).catch(()=>{});
+  } catch(e) {}
+}
+
+// 권한 확인
+async function checkDeviceAuth() {
+  const deviceId = getDeviceId();
+  const info = getDeviceInfo();
+  const payload = JSON.stringify({ deviceId, deviceType: info.type, browser: info.browser });
+  const resp = await fetch(GAS_URL + '?action=checkAuth&payload=' + encodeURIComponent(payload));
+  const data = await resp.json();
+  return data;
+}
+
+// 권한 요청
+async function requestDeviceAuth(nickname) {
+  const deviceId = getDeviceId();
+  const info = getDeviceInfo();
+  const payload = JSON.stringify({
+    deviceId, nickname,
+    deviceType: info.type,
+    browser: info.browser,
+    requestTime: getTimeStr()
+  });
+  const resp = await fetch(GAS_URL + '?action=requestAuth&payload=' + encodeURIComponent(payload));
+  return await resp.json();
+}
+
+// 권한 요청 화면
+function showAuthRequestScreen(nickname='') {
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0e3d19,#1b6b2e);padding:1rem">
+      <div style="background:#fff;border-radius:16px;padding:2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25)">
+        <div style="font-size:2.5rem;margin-bottom:.5rem">🔐</div>
+        <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:.3rem;color:#0e3d19">넉살FC 통장관리</h2>
+        <p style="font-size:.82rem;color:#666;margin-bottom:1.5rem">이 기기는 아직 접근 권한이 없어요.<br>이름을 입력하고 권한을 요청해주세요.</p>
+        <input id="authNickInput" type="text" placeholder="이름 (예: 조광식)" value="${nickname}"
+          style="width:100%;padding:.7rem 1rem;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;font-family:inherit;box-sizing:border-box;margin-bottom:.75rem;text-align:center"
+          onkeydown="if(event.key==='Enter')submitAuthRequest()">
+        <button onclick="submitAuthRequest()"
+          style="width:100%;padding:.8rem;background:#0e3d19;color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit">
+          권한 요청하기
+        </button>
+        <div id="authMsg" style="margin-top:1rem;font-size:.8rem;color:#666;display:none"></div>
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee">
+          <p style="font-size:.75rem;color:#999">관리자가 승인하면 자동으로 입장돼요</p>
+          <button onclick="recheckAuth()" style="margin-top:.5rem;padding:.4rem 1rem;background:#f5f5f5;border:1px solid #ddd;border-radius:6px;font-size:.78rem;cursor:pointer;font-family:inherit">
+            🔄 승인 확인
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitAuthRequest() {
+  const nick = document.getElementById('authNickInput').value.trim();
+  if (!nick) { alert('이름을 입력해주세요'); return; }
+  const btn = document.querySelector('#app button');
+  const msg = document.getElementById('authMsg');
+  msg.style.display='block'; msg.style.color='#666'; msg.textContent='요청 중...';
+  try {
+    const res = await requestDeviceAuth(nick);
+    if (res.ok) {
+      msg.style.color='#1b6b2e';
+      msg.textContent='✅ 권한 요청이 전송됐어요! 관리자 승인 후 "승인 확인" 버튼을 눌러주세요.';
+      localStorage.setItem('nukssal_nickname', nick);
+    } else {
+      msg.style.color='#c62828'; msg.textContent='❌ 요청 실패: ' + (res.msg||'다시 시도해주세요');
+    }
+  } catch(e) {
+    msg.style.color='#c62828'; msg.textContent='❌ 네트워크 오류';
+  }
+}
+
+async function recheckAuth() {
+  const msg = document.getElementById('authMsg');
+  if (msg) { msg.style.display='block'; msg.style.color='#666'; msg.textContent='확인 중...'; }
+  try {
+    const res = await checkDeviceAuth();
+    if (res.ok && res.authorized) {
+      sessionStorage.setItem('nukssal_auth', '1');
+      logAction('권한 승인 후 접속');
+      showLoading('구글 시트에 접속 중...');
+      loadAllFromSheets();
+    } else {
+      if (msg) { msg.style.color='#e65100'; msg.textContent='⏳ 아직 승인 대기 중이에요. 관리자에게 문의해주세요.'; }
+    }
+  } catch(e) {
+    if (msg) { msg.style.color='#c62828'; msg.textContent='❌ 확인 실패'; }
+  }
+}
+
 function checkPassword() {
   const val = document.getElementById('pwInput').value;
   if (val === APP_PASSWORD) {
     sessionStorage.setItem('nukssal_auth', '1');
-    // #app을 비워서 render()가 비밀번호 화면을 다시 그리지 않게 함
     document.getElementById('app').innerHTML = '';
+    logAction('로그인');
     showLoading('구글 시트에 접속 중...');
     loadAllFromSheets();
   } else {
+    logAction('로그인 실패', '비밀번호 오류');
     const err = document.getElementById('pwError');
     err.style.display = 'block';
     const inp = document.getElementById('pwInput');
@@ -2112,13 +2249,38 @@ function checkPassword() {
 }
 
 // ── 앱 초기화
-function initApp() {
+async function initApp() {
+  // 이미 세션 인증된 경우
   if (sessionStorage.getItem('nukssal_auth') === '1') {
     showLoading('구글 시트에 접속 중...');
     loadAllFromSheets();
-  } else {
+    return;
+  }
+
+  // 기기 권한 확인
+  showLoading('🔐 접근 권한 확인 중...');
+  try {
+    const res = await checkDeviceAuth();
+    hideLoading();
+    if (res.ok && res.authorized) {
+      // 권한 있음 → 비밀번호 화면
+      logAction('접속 (권한 있음)');
+      showPasswordScreen();
+    } else {
+      // 권한 없음 → 권한 요청 화면
+      const savedNick = localStorage.getItem('nukssal_nickname') || '';
+      showAuthRequestScreen(savedNick);
+    }
+  } catch(e) {
+    // GAS 연결 실패 → 비밀번호 화면으로 폴백
+    hideLoading();
     showPasswordScreen();
   }
+}
+
+function hideLoading() {
+  const el = document.getElementById('loadingScreen');
+  if (el) el.remove();
 }
 
 // Load Chart.js then init
