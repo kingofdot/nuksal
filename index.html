@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넉살 FC - 통장 관리 시스템</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f4f3ef;--card:#fff;--primary:#1b6b2e;--primary-light:#e6f4ea;--primary-dark:#0e3d19;
+  --accent:#c9930a;--accent-light:#fef8e4;--text:#1a1a1a;--text2:#5f5f5f;--text3:#999;
+  --border:#e2dfda;--danger:#c62828;--danger-light:#ffebee;--info:#1565c0;--info-light:#e3f2fd;
+  --shadow:0 1px 3px rgba(0,0,0,.05);--shadow-lg:0 4px 16px rgba(0,0,0,.08);
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* Header */
+.header{background:linear-gradient(135deg,#0e3d19 0%,#1b6b2e 100%);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:1.15rem;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:.5rem}
+.header h1 .fc{color:#ffd54f;font-weight:800}
+.header-right{text-align:right}
+.header-right .bal-label{font-size:.7rem;opacity:.7}
+.header-right .bal-val{font-size:1.3rem;font-weight:700;letter-spacing:-.5px}
+
+/* Tabs */
+.tabs{background:#fff;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:52px;z-index:99}
+.tab{padding:.75rem 1.1rem;font-size:.82rem;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.2s}
+.tab:hover{color:var(--primary)}
+.tab.on{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* Main */
+.main{max-width:1280px;margin:0 auto;padding:1.25rem}
+.page{display:none}.page.on{display:block}
+
+/* Card */
+.card{background:#fff;border-radius:10px;box-shadow:var(--shadow);margin-bottom:1rem;overflow:hidden}
+.card-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-hd h2{font-size:.95rem;font-weight:700}
+.card-bd{padding:1.1rem;overflow-x:auto}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.75rem;margin-bottom:1.25rem}
+.st{background:#fff;border-radius:10px;padding:.9rem 1rem;box-shadow:var(--shadow)}
+.st .lb{font-size:.7rem;color:var(--text3);margin-bottom:.2rem;font-weight:500}
+.st .vl{font-size:1.35rem;font-weight:800;letter-spacing:-1px}
+.st .vl.inc{color:var(--primary)}.st .vl.exp{color:var(--danger)}.st .vl.bal{color:var(--info)}
+.st .sub{font-size:.7rem;color:var(--text3);margin-top:.15rem}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{background:#fafaf7;padding:.6rem .7rem;text-align:left;font-weight:600;font-size:.75rem;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0}
+tbody td{padding:.55rem .7rem;border-bottom:1px solid #f0ede5;vertical-align:middle}
+tbody td[ondblclick]{cursor:cell}
+tbody td[ondblclick]:hover{background:#f0f7f2}
+tbody tr:hover{background:#fafaf7}
+.amt-in{color:var(--primary);font-weight:700}.amt-out{color:var(--danger);font-weight:700}
+
+/* Badge */
+.bdg{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600}
+.bdg-inc{background:var(--primary-light);color:var(--primary)}
+.bdg-exp{background:var(--danger-light);color:var(--danger)}
+.bdg-ann{background:var(--accent-light);color:#7a5c00}
+.bdg-dues{background:var(--info-light);color:var(--info)}
+.bdg-etc{background:#f0f0f0;color:#666}
+
+/* Form */
+.form-row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.75rem}
+.fg{display:flex;flex-direction:column;gap:.2rem}
+.fg label{font-size:.7rem;font-weight:500;color:var(--text2)}
+.fg input,.fg select{padding:.45rem .6rem;border:1px solid var(--border);border-radius:5px;font-size:.82rem;font-family:inherit;outline:none;transition:.2s}
+.fg input:focus,.fg select:focus{border-color:var(--primary)}
+
+/* Button */
+.btn{padding:.45rem .9rem;border:none;border-radius:5px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:.3rem}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-dark)}
+.btn-o{background:#fff;border:1px solid var(--border);color:var(--text)}.btn-o:hover{background:var(--bg)}
+.btn-sm{padding:.3rem .6rem;font-size:.75rem}
+
+/* Filter */
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.chip{padding:.3rem .65rem;border-radius:16px;font-size:.75rem;border:1px solid var(--border);background:#fff;cursor:pointer;transition:.15s;font-weight:500}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip:hover:not(.on){background:var(--bg)}
+
+/* Member dues grid */
+.dues-row{display:flex;align-items:center;gap:.75rem;padding:.08rem 0;border-bottom:1px solid #f0ede5}
+.dues-row:last-child{border:none}
+.dues-name{min-width:55px;font-weight:700;font-size:.85rem}
+.dues-pos{min-width:38px;font-size:.7rem;color:var(--text3)}
+.dues-contact{min-width:100px;font-size:.75rem;color:var(--text2)}
+.dues-grid{flex:1;display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.mc{text-align:center;padding:.35rem .15rem;border-radius:5px;font-size:.7rem;font-weight:600;background:#f4f3ef;color:var(--text3)}
+.mc.paid{background:var(--primary-light);color:var(--primary)}
+.mc.annual{background:var(--accent-light);color:#7a5c00}
+.mc.special{background:#ede7f6;color:#4527a0}
+.mc-hd{background:transparent!important;font-size:.65rem;color:var(--text3)!important;font-weight:400!important}
+
+/* Report */
+.rpt-sec{margin-bottom:1.5rem}
+.rpt-sec h3{font-size:.88rem;font-weight:700;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:2px solid var(--primary);display:inline-block}
+.rpt-total td{background:#fafaf7;font-weight:700}
+.rpt-grand td{background:var(--primary-dark);color:#fff;font-weight:700;padding:.7rem}
+
+/* Chart */
+.chart-wrap{height:260px;position:relative;margin:.75rem 0}
+
+/* Search */
+.search-inp{position:relative}
+.search-inp input{padding-left:1.8rem;width:100%}
+.search-inp::before{content:'';position:absolute;left:.55rem;top:50%;transform:translateY(-50%);width:14px;height:14px;border:2px solid var(--text3);border-radius:50%}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-hd{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-hd h3{font-size:.95rem;font-weight:700}
+.modal-x{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text3);padding:.2rem}
+.modal-bd{padding:1.2rem}
+.modal-ft{padding:.8rem 1.2rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.5rem}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--primary-dark);color:#fff;padding:.65rem 1.3rem;border-radius:8px;font-size:.82rem;box-shadow:var(--shadow-lg);z-index:300;animation:fiu .3s}
+@keyframes fiu{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--text3)}
+
+/* Annual bar */
+.ann-bar{background:var(--accent-light);color:#7a5c00;padding:.4rem;border-radius:5px;text-align:center;font-weight:700;font-size:.8rem;grid-column:1/-1}
+
+/* Member dues popup */
+.dues-popup{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:1rem}
+.dues-popup-box{background:#fff;border-radius:12px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);overflow:hidden}
+.dues-popup-hd{background:linear-gradient(135deg,#0e3d19,#1b6b2e);color:#fff;padding:.9rem 1.1rem;display:flex;justify-content:space-between;align-items:center}
+.dues-popup-hd h3{font-size:.95rem;font-weight:700}
+.dues-popup-body{padding:1rem 1.1rem;max-height:70vh;overflow-y:auto}
+.dues-popup-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid #f0ede5;font-size:.83rem}
+.dues-popup-row:last-child{border:none}
+.dues-popup-month{font-weight:700;min-width:40px}
+.dues-popup-date{color:var(--text3);font-size:.75rem}
+.dues-popup-status{font-weight:700}
+
+/* Member tab within page */
+.sub-tabs{display:flex;gap:.3rem;margin-bottom:1rem}
+.sub-tab{padding:.35rem .85rem;border-radius:20px;font-size:.78rem;font-weight:600;border:1px solid var(--border);background:#fff;cursor:pointer;transition:.15s}
+.sub-tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.sub-tab:hover:not(.on){background:var(--bg)}
+
+/* Withdrawn badge */
+.bdg-withdrawn{background:#f3e5f5;color:#6a1b9a}
+
+@media(max-width:768px){
+  .main{padding:.75rem}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .dues-grid{grid-template-columns:repeat(6,1fr)}
+  .dues-contact{display:none}
+  .form-row{flex-direction:column}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const BANK_DATA=[{"date":"2026.01.01","amount":1527610,"payer":"조광식","category":"기타","content":"이월금","note":"2025년 이월금","balance":1527610},{"date":"2026.01.01","amount":20000,"payer":"황성진","category":"회비","content":"1월","note":"","balance":1547610},{"date":"2026.01.01","amount":20000,"payer":"박종윤","category":"회비","content":"1월","note":"","balance":1567610},{"date":"2026.01.01","amount":200000,"payer":"위용진","category":"연납","content":"","note":"","balance":1767610},{"date":"2026.01.01","amount":20000,"payer":"최병일","category":"회비","content":"1월","note":"","balance":1787610},{"date":"2026.01.01","amount":200000,"payer":"최재원","category":"연납","content":"","note":"","balance":1987610},{"date":"2026.01.02","amount":200000,"payer":"오승수","category":"연납","content":"","note":"","balance":2187610},{"date":"2026.01.02","amount":200000,"payer":"조광식","category":"연납","content":"","note":"","balance":2387610},{"date":"2026.01.02","amount":200000,"payer":"장현구","category":"연납","content":"","note":"","balance":2587610},{"date":"2026.01.02","amount":200000,"payer":"박형우","category":"연납","content":"","note":"","balance":2787610},{"date":"2026.01.02","amount":200000,"payer":"김나진","category":"연납","content":"","note":"","balance":2987610},{"date":"2026.01.02","amount":200000,"payer":"이우현","category":"연납","content":"","note":"","balance":3187610},{"date":"2026.01.02","amount":20000,"payer":"박동현","category":"회비","content":"","note":"25년 12월","balance":3207610},{"date":"2026.01.02","amount":200000,"payer":"고성범","category":"연납","content":"","note":"","balance":3407610},{"date":"2026.01.02","amount":50000,"payer":"김나진","category":"풋살각출","content":"","note":"","balance":3457610},{"date":"2026.01.02","amount":200000,"payer":"김달","category":"연납","content":"","note":"","balance":3657610},{"date":"2026.01.02","amount":200000,"payer":"이은석","category":"연납","content":"","note":"","balance":3857610},{"date":"2026.01.02","amount":200000,"payer":"고준현","category":"연납","content":"","note":"","balance":4057610},{"date":"2026.01.02","amount":200000,"payer":"정세왕","category":"연납","content":"","note":"","balance":4257610},{"date":"2026.01.04","amount":20000,"payer":"김기택","category":"회비","content":"1월","note":"","balance":4277610},{"date":"2026.01.04","amount":-800000,"payer":"조광식","category":"동구협회관련","content":"26년도 동구협회연납비","note":"","balance":3477610},{"date":"2026.01.05","amount":-5960,"payer":"조광식","category":"물","content":"","note":"","balance":3471650},{"date":"2026.01.05","amount":20000,"payer":"오형래","category":"회비","content":"1월","note":"","balance":3491650},{"date":"2026.01.06","amount":180000,"payer":"박종윤","category":"연납","content":"","note":"","balance":3671650},{"date":"2026.01.06","amount":120000,"payer":"나민수","category":"연납","content":"","note":"전년도 회비입금초과 8만원으로 12만원 추가 입금","balance":3791650},{"date":"2026.01.07","amount":200000,"payer":"김형준","category":"연납","content":"","note":"","balance":3991650},{"date":"2026.01.07","amount":-150000,"payer":"조광식","category":"비품","content":"축구공구입","note":"","balance":3841650},{"date":"2026.01.08","amount":200000,"payer":"송재홍","category":"연납","content":"","note":"","balance":4041650},{"date":"2026.01.09","amount":-100000,"payer":"조광식","category":"동구협회관련","content":"안전기원제 찬조금","note":"","balance":3941650},{"date":"2026.01.09","amount":200000,"payer":"박성준","category":"연납","content":"","note":"","balance":4141650},{"date":"2026.01.09","amount":20000,"payer":"박은성","category":"회비","content":"1월","note":"","balance":4161650},{"date":"2026.01.10","amount":200000,"payer":"현성주","category":"연납","content":"","note":"","balance":4361650},{"date":"2026.01.12","amount":72,"payer":"조광식","category":"이자","content":"","note":"","balance":4361722},{"date":"2026.01.12","amount":20000,"payer":"최민재","category":"회비","content":"1월","note":"","balance":4381722},{"date":"2026.01.13","amount":200000,"payer":"배기호","category":"연납","content":"","note":"","balance":4581722},{"date":"2026.01.13","amount":200000,"payer":"강영승","category":"연납","content":"","note":"","balance":4781722},{"date":"2026.01.13","amount":-120000,"payer":"조광식","category":"풋살대관","content":"풋살(1/15)","note":"","balance":4661722},{"date":"2026.01.14","amount":20000,"payer":"정영창","category":"회비","content":"1월","note":"","balance":4681722},{"date":"2026.01.17","amount":200000,"payer":"고경범","category":"연납","content":"","note":"","balance":4881722},{"date":"2026.01.19","amount":40000,"payer":"양승진","category":"회비","content":"1월","note":"2025년 12월 포함","balance":4921722},{"date":"2026.01.22","amount":-80000,"payer":"조광식","category":"운동장대관","content":"02/20 율도 대관비","note":"","balance":4841722},{"date":"2026.01.22","amount":-8000,"payer":"조광식","category":"운동장대관","content":"02/23 율도대관비 취소 수수료","note":"","balance":4833722},{"date":"2026.01.22","amount":-80000,"payer":"조광식","category":"운동장대관","content":"02/24 율도 대관비","note":"","balance":4753722},{"date":"2026.01.22","amount":-102500,"payer":"조광식","category":"운동장대관","content":"02/26 중구 대관비","note":"","balance":4651222},{"date":"2026.01.22","amount":-70000,"payer":"조광식","category":"운동장대관","content":"02/23 동구 대관비","note":"","balance":4581222},{"date":"2026.01.22","amount":88000,"payer":"조광식","category":"운동장대관","content":"02/24 송림FC 입금","note":"","balance":4669222},{"date":"2026.01.24","amount":171,"payer":"조광식","category":"이자","content":"","note":"","balance":4669393},{"date":"2026.01.26","amount":200000,"payer":"이상열","category":"연납","content":"","note":"","balance":4869393},{"date":"2026.01.26","amount":-17880,"payer":"조광식","category":"물","content":"(주)와마트(지점) 물","note":"","balance":4851513},{"date":"2026.01.27","amount":200000,"payer":"지덕만","category":"연납","content":"","note":"","balance":5051513},{"date":"2026.01.27","amount":-91500,"payer":"조광식","category":"비품","content":"조끼 결제","note":"","balance":4960013},{"date":"2026.01.28","amount":-35000,"payer":"조광식","category":"매치비용","content":"매치비용 한레블FC","note":"","balance":4925013},{"date":"2026.01.30","amount":200000,"payer":"채인선","category":"연납","content":"","note":"","balance":5125013},{"date":"2026.01.30","amount":200000,"payer":"곽경민","category":"연납","content":"","note":"","balance":5325013},{"date":"2026.01.30","amount":200000,"payer":"김진태","category":"연납","content":"","note":"","balance":5525013},{"date":"2026.01.30","amount":20000,"payer":"박준수","category":"회비","content":"1월","note":"","balance":5545013},{"date":"2026.01.30","amount":20000,"payer":"김복락","category":"회비","content":"1월","note":"","balance":5565013},{"date":"2026.01.30","amount":20000,"payer":"송승렬","category":"회비","content":"1월","note":"","balance":5585013},{"date":"2026.01.31","amount":20000,"payer":"김성훈","category":"회비","content":"1월","note":"","balance":5605013},{"date":"2026.01.31","amount":200000,"payer":"박준","category":"연납","content":"","note":"","balance":5805013},{"date":"2026.01.31","amount":20000,"payer":"윤승원","category":"회비","content":"1월","note":"","balance":5825013},{"date":"2026.01.31","amount":200000,"payer":"신언호","category":"연납","content":"","note":"","balance":6025013},{"date":"2026.01.31","amount":200000,"payer":"김동규","category":"연납","content":"","note":"","balance":6225013},{"date":"2026.01.31","amount":200000,"payer":"김민범","category":"연납","content":"","note":"","balance":6425013},{"date":"2026.02.01","amount":20000,"payer":"황성진","category":"회비","content":"2월","note":"","balance":6445013},{"date":"2026.02.01","amount":20000,"payer":"박동현","category":"회비","content":"1월","note":"","balance":6465013},{"date":"2026.02.01","amount":200000,"payer":"김한기","category":"연납","content":"","note":"","balance":6665013},{"date":"2026.02.01","amount":-140000,"payer":"조광식","category":"운동장대관","content":"동구대관비(2월)","note":"","balance":6525013},{"date":"2026.02.01","amount":20000,"payer":"정찬","category":"회비","content":"1월","note":"","balance":6545013},{"date":"2026.02.01","amount":40000,"payer":"명순주","category":"회비","content":"1,2월","note":"","balance":6585013},{"date":"2026.02.01","amount":40000,"payer":"김준기","category":"회비","content":"1,2월","note":"","balance":6625013},{"date":"2026.02.01","amount":-140000,"payer":"조광식","category":"운동장대관","content":"동구대관비(2월-수요일)","note":"","balance":6485013},{"date":"2026.02.02","amount":20000,"payer":"박준수","category":"회비","content":"2월","note":"","balance":6505013},{"date":"2026.02.02","amount":40000,"payer":"강지중","category":"회비","content":"1,2월","note":"","balance":6545013},{"date":"2026.02.04","amount":40000,"payer":"정성민","category":"회비","content":"1,2월","note":"","balance":6585013},{"date":"2026.02.04","amount":-39000,"payer":"조광식","category":"유니폼관련","content":"이준희 3xl","note":"","balance":6546013},{"date":"2026.02.05","amount":-11920,"payer":"조광식","category":"물","content":"","note":"","balance":6534093},{"date":"2026.02.07","amount":20000,"payer":"양승진","category":"회비","content":"2월","note":"","balance":6554093},{"date":"2026.02.10","amount":20000,"payer":"박은성","category":"회비","content":"2월","note":"","balance":6574093},{"date":"2026.02.10","amount":48,"payer":"조광식","category":"이자","content":"","note":"","balance":6574141},{"date":"2026.02.10","amount":40000,"payer":"최병일","category":"회비","content":"2,3월","note":"","balance":6614141},{"date":"2026.02.10","amount":20000,"payer":"오형래","category":"회비","content":"2월","note":"","balance":6634141},{"date":"2026.02.10","amount":20000,"payer":"정영창","category":"회비","content":"2월","note":"","balance":6654141},{"date":"2026.02.16","amount":40000,"payer":"김태훈","category":"매치비용","content":"PCY 매치비용","note":"","balance":6694141},{"date":"2026.02.20","amount":-5960,"payer":"조광식","category":"물","content":"","note":"","balance":6688181},{"date":"2026.02.21","amount":-70000,"payer":"조광식","category":"운동장대관","content":"동구 3/9","note":"","balance":6618181},{"date":"2026.02.21","amount":-70000,"payer":"조광식","category":"운동장대관","content":"동구 3/23","note":"","balance":6548181},{"date":"2026.02.21","amount":-80000,"payer":"조광식","category":"운동장대관","content":"율도 3/23","note":"","balance":6468181},{"date":"2026.02.21","amount":-102500,"payer":"조광식","category":"운동장대관","content":"중구 3/5","note":"","balance":6365681},{"date":"2026.02.23","amount":-14900,"payer":"조광식","category":"물","content":"","note":"","balance":6350781},{"date":"2026.02.25","amount":51250,"payer":"조광식","category":"매치비용","content":"아라FC 매치비용","note":"","balance":6402031},{"date":"2026.02.25","amount":20000,"payer":"윤승원","category":"회비","content":"2월","note":"","balance":6422031},{"date":"2026.02.25","amount":20000,"payer":"송승렬","category":"회비","content":"2월","note":"","balance":6442031},{"date":"2026.02.25","amount":20000,"payer":"최민재","category":"회비","content":"2월","note":"","balance":6462031},{"date":"2026.02.25","amount":20000,"payer":"김복락","category":"회비","content":"2월","note":"","balance":6482031},{"date":"2026.02.25","amount":40000,"payer":"김기택","category":"회비","content":"2월,4월 / 3월 파견","note":"","balance":6522031},{"date":"2026.02.26","amount":-230000,"payer":"조광식","category":"운동장대관","content":"3월","note":"","balance":6292031},{"date":"2026.02.27","amount":200000,"payer":"유도규","category":"연납","content":"","note":"","balance":6492031},{"date":"2026.02.28","amount":20000,"payer":"박동현","category":"회비","content":"2월","note":"","balance":6512031},{"date":"2026.02.29","amount":20000,"payer":"김성훈","category":"회비","content":"2월","note":"","balance":6532031},{"date":"2026.02.27","amount":40000,"payer":"정찬","category":"회비","content":"2. 3월","note":"","balance":6572031},{"date":"2026.02.28","amount":90,"payer":"조광식","category":"이자","content":"","note":"","balance":6572121},{"date":"2026.02.28","amount":20000,"payer":"양승진","category":"회비","content":"3월","note":"","balance":6592121},{"date":"2026.02.28","amount":6739,"payer":"조광식","category":"이자","content":"세이프박스이자","note":"","balance":6598860},{"date":"2026.03.01","amount":20000,"payer":"황성진","category":"회비","content":"3월","note":"","balance":6618860},{"date":"2026.03.01","amount":20000,"payer":"최민재","category":"회비","content":"3월","note":"","balance":6638860},{"date":"2026.03.07","amount":20000,"payer":"정영창","category":"회비","content":"3월","note":"","balance":6658860},{"date":"2026.03.09","amount":-29800,"payer":"조광식","category":"물","content":"","note":"","balance":6629060},{"date":"2026.03.10","amount":-43000,"payer":"조광식","category":"비품","content":"골키퍼장갑2개","note":"","balance":6586060},{"date":"2026.03.10","amount":12,"payer":"조광식","category":"이자","content":"체크카드 캐시백","note":"","balance":6586072},{"date":"2026.03.10","amount":20000,"payer":"박은성","category":"회비","content":"3월","note":"","balance":6606072}];
+
+const MEMBER_DATA=[{"group":0,"position":"회장","name":"이상열","jersey":29,"year":1982,"age":44,"contact":"010-6712-2924","annual_date":"2026-01-26","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":1,"position":"부회장","name":"김민범","jersey":99,"year":1983,"age":43,"contact":"010-9173-7065","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":2,"position":"감독","name":"김동규","jersey":8,"year":1986,"age":40,"contact":"010-3934-2540","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"강영승","jersey":24,"year":1974,"age":52,"contact":"010-8864-6065","annual_date":"2026-01-13","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"김진태","jersey":11,"year":1976,"age":50,"contact":"010-4913-2217","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":3,"position":"고문","name":"채인선","jersey":14,"year":1978,"age":48,"contact":"010-9113-2522","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"총무","name":"조광식","jersey":35,"year":1988,"age":38,"contact":"010-4817-9180","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"부총무","name":"최재원","jersey":58,"year":1993,"age":33,"contact":"010-8181-7421","annual_date":"2026-01-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":4,"position":"간사","name":"위용진","jersey":88,"year":1987,"age":39,"contact":"010-6324-6788","annual_date":"2026-01-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"신언호","jersey":50,"year":1987,"age":39,"contact":"010-2831-1730","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"유도규","jersey":30,"year":1987,"age":39,"contact":"010-9929-2148","annual_date":"2026-02-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":5,"position":"코치","name":"정영창","jersey":84,"year":1984,"age":42,"contact":"010-6263-0935","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"강지중","jersey":17,"year":1994,"age":32,"contact":"010-4125-2318","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고경범","jersey":54,"year":1992,"age":34,"contact":"010-4791-0907","annual_date":"2026-01-17","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고성범","jersey":95,"year":1995,"age":31,"contact":"010-8469-4700","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"고준현","jersey":3,"year":1989,"age":37,"contact":"010-8931-3779","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"곽경민","jersey":77,"year":1999,"age":27,"contact":"010-2272-7705","annual_date":"2026-01-30","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김기택","jersey":12,"year":2001,"age":25,"contact":"010-3099-9297","annual_date":"","m1":"O","m2":"O","m3":"파견","m4":"O","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김나진","jersey":16,"year":1994,"age":32,"contact":"010-3783-6667","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김달","jersey":65,"year":1991,"age":35,"contact":"010-7685-8765","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김복락","jersey":31,"year":1989,"age":37,"contact":"010-8619-3328","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김성훈","jersey":74,"year":1988,"age":38,"contact":"010-8925-3704","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김준기","jersey":91,"year":1991,"age":35,"contact":"010-5550-3996","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김한기","jersey":80,"year":1990,"age":36,"contact":"010-3565-9527","annual_date":"2026-02-01","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"김형준","jersey":97,"year":1997,"age":29,"contact":"010-9341-4825","annual_date":"2026-01-07","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"나민수","jersey":21,"year":1992,"age":34,"contact":"010-2813-7446","annual_date":"2026-01-06","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"명순주","jersey":87,"year":1987,"age":39,"contact":"010-4021-0327","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박동현","jersey":93,"year":1993,"age":33,"contact":"010-2103-5393","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박성준","jersey":7,"year":1994,"age":32,"contact":"010-6677-3172","annual_date":"2026-01-09","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박은성","jersey":22,"year":2002,"age":24,"contact":"010-2477-4434","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박종윤","jersey":39,"year":1988,"age":38,"contact":"010-4815-1497","annual_date":"2026-01-06","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박준","jersey":28,"year":1998,"age":28,"contact":"010-4489-7677","annual_date":"2026-01-31","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박준수","jersey":96,"year":1996,"age":30,"contact":"010-8138-2584","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"박형우","jersey":61,"year":1980,"age":46,"contact":"010-6852-4087","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"배기호","jersey":4,"year":1995,"age":31,"contact":"010-4787-5790","annual_date":"2026-01-13","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"송승렬","jersey":98,"year":1998,"age":28,"contact":"010-2449-1462","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"송재홍","jersey":25,"year":1991,"age":35,"contact":"010-5678-0449","annual_date":"2026-01-08","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"양승진","jersey":60,"year":1986,"age":40,"contact":"010-7794-8090","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"오승수","jersey":23,"year":1991,"age":35,"contact":"010-3231-1505","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"오형래","jersey":26,"year":1991,"age":35,"contact":"010-8695-8982","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"윤승원","jersey":76,"year":2001,"age":25,"contact":"010-9464-3299","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이우현","jersey":69,"year":1990,"age":36,"contact":"010-8960-9650","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이은석","jersey":41,"year":1998,"age":28,"contact":"010-2070-6284","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이준희","jersey":71,"year":1987,"age":39,"contact":"010-5681-1123","annual_date":"2026-02-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"이학주","jersey":5,"year":1985,"age":41,"contact":"010-8837-1051","annual_date":"","m1":"","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"장현구","jersey":44,"year":1984,"age":42,"contact":"010-9195-5009","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정성민","jersey":15,"year":1995,"age":31,"contact":"010-5858-9524","annual_date":"","m1":"O","m2":"O","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정세왕","jersey":90,"year":1990,"age":36,"contact":"010-3316-7179","annual_date":"2026-01-02","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"정찬","jersey":66,"year":2001,"age":25,"contact":"010-4812-2797","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"지덕만","jersey":1,"year":1982,"age":44,"contact":"010-2636-1100","annual_date":"2026-01-27","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"최민재","jersey":34,"year":1997,"age":29,"contact":"010-6847-6454","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"최병일","jersey":9,"year":1986,"age":40,"contact":"010-8884-4703","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"현성주","jersey":6,"year":1990,"age":36,"contact":"010-5847-9852","annual_date":"2026-01-10","m1":"연납","m2":"","m3":"","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":6,"position":"회원","name":"황성진","jersey":13,"year":1982,"age":44,"contact":"010-2546-8680","annual_date":"","m1":"O","m2":"O","m3":"O","m4":"","m5":"","m6":"","m7":"","m8":"","m9":"","m10":"","m11":"","m12":""},{"group":7,"position":"회원","name":"김동연","jersey":47,"year":2001,"age":25,"contact":"010-3918-4077","annual_date":"해외출장","m1":"해외출장","m2":"해외출장","m3":"해외출장","m4":"해외출장","m5":"해외출장","m6":"해외출장","m7":"해외출장","m8":"해외출장","m9":"해외출장","m10":"해외출장","m11":"해외출장","m12":"해외출장"},{"group":7,"position":"회원","name":"김승현","jersey":19,"year":1992,"age":34,"contact":"010-5550-0441","annual_date":"부상","m1":"부상","m2":"부상","m3":"부상","m4":"부상","m5":"부상","m6":"부상","m7":"부상","m8":"부상","m9":"부상","m10":"부상","m11":"부상","m12":"부상"},{"group":7,"position":"회원","name":"남은석","jersey":42,"year":2001,"age":25,"contact":"010-8561-4384","annual_date":"군대","m1":"군대","m2":"군대","m3":"군대","m4":"군대","m5":"군대","m6":"군대","m7":"군대","m8":"군대","m9":"군대","m10":"군대","m11":"군대","m12":"군대"},{"group":7,"position":"회원","name":"윤성호","jersey":33,"year":1992,"age":34,"contact":"010-6424-6277","annual_date":"부상","m1":"부상","m2":"부상","m3":"부상","m4":"부상","m5":"부상","m6":"부상","m7":"부상","m8":"부상","m9":"부상","m10":"부상","m11":"부상","m12":"부상"},{"group":7,"position":"회원","name":"천정훈","jersey":2,"year":1995,"age":31,"contact":"010-7551-6707","annual_date":"육아","m1":"육아","m2":"육아","m3":"육아","m4":"육아","m5":"육아","m6":"육아","m7":"육아","m8":"육아","m9":"육아","m10":"육아","m11":"육아","m12":"육아"}];
+
+const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const CATS=[...new Set(BANK_DATA.map(t=>t.category))];
+const fmt=n=>Number(n).toLocaleString('ko-KR');
+
+// 탈퇴회원 데이터
+let WITHDRAWN_DATA=[];
+
+function showToast(msg,dur=2800){
+  const old=document.querySelector('.toast');if(old)old.remove();
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),dur);
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let state={tab:'bank',search:'',catFilter:'전체',monthFilter:'전체',rptStart:'2026-01-01',rptEnd:'2026-03-10',memberSubTab:'active',memberSort:'seq',backNumbers:[],donations:[]};
+
+// 검색: keyup에서만 실행, 한글 조합중(composing)엔 완전히 무시
+let _isComposing=false;
+function setTab(t){state.tab=t;render()}
+function doSearch(v){state.search=v;render();}
+function setCatFilter(v){state.catFilter=v;render()}
+function setMonthFilter(v){state.monthFilter=v;render()}
+
+// ============================================================
+// COMPUTED
+// ============================================================
+function getStats(){
+  const last=BANK_DATA[BANK_DATA.length-1];
+  const inc=BANK_DATA.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const exp=BANK_DATA.filter(t=>t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0);
+  return{balance:last?last.balance:0,income:inc,expense:exp,count:BANK_DATA.length};
+}
+
+function getFiltered(){
+  return [...BANK_DATA].reverse().filter(t=>{
+    if(state.catFilter!=='전체'&&t.category!==state.catFilter)return false;
+    if(state.monthFilter!=='전체'){
+      const m=parseInt(t.date.split('.')[1]);
+      if(m!==parseInt(state.monthFilter))return false;
+    }
+    if(state.search){
+      const s=state.search.toLowerCase();
+      if(!t.payer.toLowerCase().includes(s)&&!t.content.toLowerCase().includes(s)&&!t.category.toLowerCase().includes(s)&&!t.note.toLowerCase().includes(s))return false;
+    }
+    return true;
+  });
+}
+
+// 비활동 판별: status 필드 또는 group>=7
+const INACTIVE_REASONS = ['부상','군대','해외출장','육아','파견'];
+function isInactiveMember(m) {
+  if (m.group >= 7) return true;
+  if (m.status && INACTIVE_REASONS.includes(m.status)) return true;
+  return false;
+}
+function getInactiveReason(m) {
+  if (m.status && m.status !== '정상') return m.status;
+  if (m.group >= 7) return m.m1 || m.annual_date || '비활동';
+  return '비활동';
+}
+function getActiveMembers(){return MEMBER_DATA.filter(m=>!isInactiveMember(m))}
+function getInactiveMembers(){return MEMBER_DATA.filter(m=>isInactiveMember(m))}
+
+function getDuesStats(){
+  const active=getActiveMembers();
+  let annualCount=0,monthlyPaid=0;
+  active.forEach(m=>{
+    if(m.m1==='연납'){annualCount++;monthlyPaid+=12;return;}
+    for(let i=1;i<=12;i++){
+      const v=m['m'+i];
+      if(v==='O'||v==='20000')monthlyPaid++;
+    }
+  });
+  return{total:active.length,annualCount,monthlyPaid,expected:active.length*12,rate:active.length*12>0?Math.round(monthlyPaid/(active.length*12)*100):0};
+}
+
+function getReport(){
+  const s=state.rptStart.replace(/-/g,'.');
+  const e=state.rptEnd.replace(/-/g,'.');
+
+  // 시스템 제외, 기간 필터
+  const filtered=BANK_DATA.filter(t=>
+    t.date>=s && t.date<=e && t.payer!=='시스템'
+  );
+
+  const income={},expense={};
+  let totalIn=0,totalOut=0;
+
+  // 4. 시작일 전날 잔액 → 이월잔액으로 수입에 추가
+  const prevTx=BANK_DATA.filter(t=>t.date<s && t.payer!=='시스템');
+  if(prevTx.length>0){
+    const prevBal=prevTx[prevTx.length-1].balance;
+    if(prevBal!==0){
+      const syntheticCat='이월잔액';
+      if(!income[syntheticCat])income[syntheticCat]={total:0,items:[]};
+      const abs=Math.abs(prevBal);
+      income[syntheticCat].total+=abs;
+      income[syntheticCat].items.push({
+        date:s, amount:prevBal, payer:'', category:syntheticCat,
+        content:`시작일(${s}) 전일 잔액`, note:'', abs,
+        _synthetic:true
+      });
+      totalIn+=abs;
+    }
+  }
+
+  filtered.forEach(t=>{
+    const g=t.amount>=0?income:expense;
+    const cat=t.category||'기타';
+    if(!g[cat])g[cat]={total:0,items:[]};
+    const abs=Math.abs(t.amount);
+    g[cat].total+=abs;g[cat].items.push({...t,abs});
+    if(t.amount>=0)totalIn+=abs;else totalOut+=abs;
+  });
+
+  return{income,expense,totalIn,totalOut,balance:totalIn-totalOut,count:filtered.length};
+}
+
+function getMonthlyChart(){
+  const data=Array(12).fill(0).map(()=>({inc:0,exp:0}));
+  BANK_DATA.forEach(t=>{
+    const m=parseInt(t.date.split('.')[1])-1;
+    if(m>=0&&m<12){
+      if(t.amount>=0)data[m].inc+=t.amount;
+      else data[m].exp+=Math.abs(t.amount);
+    }
+  });
+  return data;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function catBadge(cat,amt){
+  const isInc=amt>=0;
+  const incCats=['회비','연납','풋살각출','이자','매치비용','기타'];
+  const cls=incCats.includes(cat)&&isInc?'bdg-inc':'bdg-exp';
+  return `<span class="bdg ${cat==='연납'?'bdg-ann':cls}">${cat}</span>`;
+}
+
+function monthCell(m,val){
+  if(!val)return `<div class="mc">-</div>`;
+  if(val==='연납')return `<div class="mc annual">연납</div>`;
+  if(val==='O'||val==='20000')return `<div class="mc paid">${fmt(20000)}</div>`;
+  if(['부상','군대','해외출장','육아','파견'].includes(val))return `<div class="mc special">${val}</div>`;
+  return `<div class="mc">${val}</div>`;
+}
+
+function renderBankPage(){
+  const stats=getStats();
+  const filtered=getFiltered();
+  const allCats=['전체',...CATS];
+  const allMonths=['전체','1','2','3','4','5','6','7','8','9','10','11','12'];
+  return `
+    <div class="stats">
+      <div class="st"><div class="lb">총 입금</div><div class="vl inc">+${fmt(stats.income)}원</div><div class="sub">${BANK_DATA.filter(t=>t.amount>0).length}건</div></div>
+      <div class="st"><div class="lb">총 출금</div><div class="vl exp">-${fmt(stats.expense)}원</div><div class="sub">${BANK_DATA.filter(t=>t.amount<0).length}건</div></div>
+      <div class="st"><div class="lb">현재 잔액</div><div class="vl bal">${fmt(stats.balance)}원</div><div class="sub">최종 거래 기준</div></div>
+      <div class="st"><div class="lb">총 거래</div><div class="vl">${stats.count}건</div><div class="sub">2026년</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <h2>거래 내역</h2>
+        <div style="display:flex;gap:.4rem">
+          ${_accessToken?`<button class="btn btn-sm" style="background:#fbbc04;color:#000" onclick="saveBankbookToSheet()">💾 시트 저장</button>`:''}
+          <button class="btn btn-p btn-sm" onclick="openAddModal()">＋ 내역 추가</button>
+          <button class="btn btn-sm" style="background:#546e7a;color:#fff" onclick="openBulkModal()">📋 일괄 추가</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <div class="form-row" style="align-items:flex-end;gap:.5rem">
+          <div class="fg" style="flex:1">
+            <input id="searchInput" placeholder="이름, 내용, 카테고리로 검색..."
+              value="${state.search}"
+              onkeydown="if(event.key==='Enter')doSearch(this.value)">
+          </div>
+          <button class="btn btn-p" style="flex-shrink:0" onclick="doSearch(document.getElementById('searchInput').value)">🔍 검색</button>
+          ${state.search?`<button class="btn btn-o" style="flex-shrink:0" onclick="doSearch('');document.getElementById('searchInput').value=''">✕ 초기화</button>`:''}
+        </div>
+        <div style="margin-bottom:.4rem;font-size:.72rem;color:var(--text3);font-weight:600">월별 조회</div>
+        <div class="chips" style="margin-bottom:.5rem">${allMonths.map(m=>`<span class="chip ${state.monthFilter===m?'on':''}" onclick="setMonthFilter('${m}')">${m==='전체'?'전체':m+'월'}</span>`).join('')}</div>
+        <div style="margin-bottom:.4rem;font-size:.72rem;color:var(--text3);font-weight:600">카테고리</div>
+        <div class="chips">${allCats.map(c=>`<span class="chip ${state.catFilter===c?'on':''}" onclick="setCatFilter('${c}')">${c}</span>`).join('')}</div>
+        ${filtered.length===0?'<div class="empty">검색 결과가 없습니다</div>':`
+        <div style="font-size:.72rem;color:var(--text3);margin-bottom:.4rem">💡 셀을 더블클릭하면 바로 수정할 수 있어요</div>
+        <table style="table-layout:fixed;width:100%">
+          <colgroup>
+            <col style="width:9%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:14%">
+            <col style="width:13%">
+            <col style="width:13%">
+            <col style="width:5%">
+          </colgroup>
+          <thead><tr>
+            <th style="white-space:normal">날짜</th>
+            <th style="white-space:normal;text-align:center">이름</th>
+            <th style="white-space:normal;text-align:center">구분</th>
+            <th style="white-space:normal;text-align:center">내용</th>
+            <th style="white-space:normal;text-align:center">비고</th>
+            <th style="white-space:normal;text-align:right">금액</th>
+            <th style="white-space:normal;text-align:right">잔액</th>
+            <th></th>
+          </tr></thead>
+          <tbody>${filtered.map((t,fi)=>{
+            const origIdx=BANK_DATA.length-1-BANK_DATA.slice().reverse().findIndex(b=>b===t);
+            const isDues=(t.category==='회비'||t.category==='연납');
+            const memberExists=isDues&&MEMBER_DATA.find(m=>m.name===t.payer);
+            const payerCell=memberExists
+              ?`<td style="font-weight:600;text-align:center" ondblclick="editCell(event,${origIdx},'payer')"><span style="cursor:pointer;color:var(--primary);border-bottom:1px dashed var(--primary)" onclick="showDuesPopup('${t.payer}')">${t.payer}</span></td>`
+              :`<td style="font-weight:600;text-align:center" ondblclick="editCell(event,${origIdx},'payer')">${t.payer||'-'}</td>`;
+            return `<tr>
+              <td ondblclick="editCell(event,${origIdx},'date')">${t.date}</td>
+              ${payerCell}
+              <td style="text-align:center" ondblclick="editCell(event,${origIdx},'category')">${catBadge(t.category,t.amount)}</td>
+              <td style="text-align:center" ondblclick="editCell(event,${origIdx},'content')">${t.content||'-'}</td>
+              <td style="font-size:.75rem;color:var(--text3);text-align:center" ondblclick="editCell(event,${origIdx},'note')">${t.note||''}</td>
+              <td style="text-align:right" class="${t.amount>=0?'amt-in':'amt-out'}" ondblclick="editCell(event,${origIdx},'amount')">${t.amount>=0?'+':''}${fmt(t.amount)}원</td>
+              <td style="text-align:right">${fmt(t.balance)}원</td>
+              <td><button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger);padding:.2rem .5rem;font-size:.7rem" onclick="deleteRow(${origIdx})">삭제</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>
+    ${renderAddModal()}`;
+}
+
+function renderDuesPage(){
+  const ds=getDuesStats();
+  const today=new Date().toLocaleDateString('ko-KR');
+
+  // 회원관리와 동일한 정렬 (group → 이름 가나다) = 순번순
+  const sorted=[...MEMBER_DATA].sort((a,b)=>{
+    if(a.group!==b.group) return a.group-b.group;
+    return a.name.localeCompare(b.name,'ko');
+  });
+  const active=sorted.filter(m=>!isInactiveMember(m));
+  const inactive=sorted.filter(m=>isInactiveMember(m));
+
+  return `
+    <div class="stats">
+      <div class="st"><div class="lb">활동 회원</div><div class="vl">${ds.total}명</div></div>
+      <div class="st"><div class="lb">연납 회원</div><div class="vl" style="color:var(--accent)">${ds.annualCount}명</div></div>
+      <div class="st"><div class="lb">납부 월수</div><div class="vl inc">${ds.monthlyPaid}개월</div><div class="sub">전체 ${ds.expected}개월 중</div></div>
+      <div class="st"><div class="lb">납부율</div><div class="vl ${ds.rate>=70?'inc':ds.rate>=40?'':'exp'}">${ds.rate}%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <h2>회비 납부 현황 (활동 회원)</h2>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button class="btn btn-sm" style="background:#6a1b9a;color:#fff" onclick="openDuesEditPopup()">✏️ 직접 편집</button>
+          <button class="btn btn-sm" style="background:#1565c0;color:#fff" onclick="exportDues('clipboard')">📋 카톡 복사</button>
+          <button class="btn btn-sm" style="background:#e65100;color:#fff" onclick="exportDues('jpg')">🖼 JPG 저장</button>
+          <button class="btn btn-sm" style="background:#c62828;color:#fff" onclick="exportDues('pdf')">📄 PDF 저장</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <div id="duesExportArea" style="background:#fff;padding:.5rem">
+        <div style="text-align:center;font-weight:800;font-size:1rem;margin-bottom:.3rem;letter-spacing:-.5px">넉살FC 회비납부현황</div>
+        <div style="text-align:center;font-size:.72rem;color:#888;margin-bottom:.75rem">기준일: ${today}</div>
+        <div class="dues-row" style="border-bottom:2px solid var(--border)">
+          <div class="dues-name" style="font-size:.7rem;color:var(--text3);font-weight:400">이름</div>
+          <div class="dues-pos" style="font-size:.65rem;color:var(--text3)">직책</div>
+          <div class="dues-contact" style="font-size:.65rem;color:var(--text3)">연락처</div>
+          <div class="dues-grid">${MONTHS.map(m=>`<div class="mc mc-hd">${m}</div>`).join('')}</div>
+        </div>
+        ${active.map(m=>{
+          const isAnnual=m.m1==='연납';
+          return `<div class="dues-row">
+            <div class="dues-name">${m.name}</div>
+            <div class="dues-pos">${m.position}</div>
+            <div class="dues-contact">${m.contact}</div>
+            <div class="dues-grid">${isAnnual?`<div class="ann-bar">연납 완료</div>`:
+              MONTHS.map((_,i)=>monthCell(i+1,m['m'+(i+1)])).join('')}</div>
+          </div>`;
+        }).join('')}
+        </div><!-- /duesExportArea -->
+      </div>
+    </div>
+    ${inactive.length>0?`
+    <div class="card" style="opacity:.8;margin-top:.5rem">
+      <div class="card-hd" style="background:#f5f5f5"><h2 style="color:var(--text3);font-size:.88rem">비활동 회원 (${inactive.length}명)</h2></div>
+      <div class="card-bd" style="padding:.75rem">
+        <div class="dues-row" style="border-bottom:2px solid var(--border)">
+          <div class="dues-name" style="font-size:.7rem;color:var(--text3);font-weight:400">이름</div>
+          <div class="dues-pos" style="font-size:.65rem;color:var(--text3)">직책</div>
+          <div class="dues-contact" style="font-size:.65rem;color:var(--text3)">연락처</div>
+          <div class="dues-grid">${MONTHS.map(mn=>`<div class="mc mc-hd">${mn}</div>`).join('')}</div>
+        </div>
+        ${inactive.map(m=>`<div class="dues-row" style="opacity:.6">
+          <div class="dues-name">${m.name}</div>
+          <div class="dues-pos">${m.position}</div>
+          <div class="dues-contact">${m.contact}</div>
+          <div class="dues-grid"><div class="ann-bar" style="background:#f3e5f5;color:#6a1b9a">${getInactiveReason(m)}</div></div>
+        </div>`).join('')}
+      </div>
+    </div>`:''}`;
+}
+
+function renderReportPage(){
+  const rpt=getReport();
+
+  // ── 카테고리별 표시 규칙
+  // merge: 이름 표시 없이 합산  /  dateOnly: 내용을 날짜만 표기
+  // 각 항목을 어떻게 표시할지 결정
+  const MERGE_CATS  = new Set(['연납','회비','이자','풋살각출']); // 합산 표시
+  const DATE_CATS   = new Set(['물']);                              // 내용 = 날짜만
+  const SIMPLE_CATS = new Set(['이월잔액']);                        // 내용만, 이름 없음
+
+  const renderSection=(title,groups,isInc)=>{
+    const cats=Object.keys(groups).sort();
+    if(!cats.length)return '';
+    let rows='';
+
+    cats.forEach(cat=>{
+      const g=groups[cat];
+      const isMerge=MERGE_CATS.has(cat);
+      const isDate=DATE_CATS.has(cat);
+      const isSimple=SIMPLE_CATS.has(cat);
+
+      if(isMerge){
+        const total=g.items.reduce((s,t)=>s+t.abs,0);
+        const origIdxList=g.items.map(t=>BANK_DATA.indexOf(t));
+        rows+=`<tr>
+          <td style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>
+          <td></td>
+          <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${JSON.stringify(origIdxList).replace(/"/g,"'")},'amount',${isInc})">${fmt(total)}원</td>
+        </tr>`;
+      } else if(isDate){
+        g.items.forEach((item,i)=>{
+          const origIdx=BANK_DATA.indexOf(item);
+          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>`:''}
+            <td style="text-align:center" ondblclick="editReportCell(event,${origIdx},'content',${isInc})">${item.date||''}</td>
+            <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${origIdx},'amount',${isInc})">${fmt(item.abs)}원</td>
+          </tr>`;
+        });
+      } else if(isSimple){
+        g.items.forEach((item,i)=>{
+          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>`:''}
+            <td></td>
+            <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}">${fmt(item.abs)}원</td>
+          </tr>`;
+        });
+      } else {
+        g.items.forEach((item,i)=>{
+          const origIdx=BANK_DATA.indexOf(item);
+          const label=item.content||cat;
+          rows+=`<tr>${i===0?`<td rowspan="${g.items.length}" style="font-weight:700;vertical-align:middle;text-align:center">${cat}</td>`:''}
+            <td style="text-align:center" ondblclick="editReportCell(event,${origIdx},'content',${isInc})">${label}</td>
+            <td style="text-align:right" class="${isInc?'amt-in':'amt-out'}" ondblclick="editReportCell(event,${origIdx},'amount',${isInc})">${fmt(item.abs)}원</td>
+          </tr>`;
+        });
+      }
+    });
+
+    rows+=`<tr class="rpt-total">
+      <td colspan="2" style="text-align:center;font-weight:700">${title} 합계</td>
+      <td style="text-align:right;font-weight:800" class="${isInc?'amt-in':'amt-out'}">${fmt(isInc?rpt.totalIn:rpt.totalOut)}원</td>
+    </tr>`;
+    return `<div class="rpt-sec">
+      <h3>${title}</h3>
+      <table style="table-layout:fixed;width:100%">
+        <thead><tr>
+          <th style="width:33.3%;text-align:center;white-space:normal">항목</th>
+          <th style="width:33.3%;text-align:center;white-space:normal">내용</th>
+          <th style="width:33.4%;text-align:right;white-space:normal">금액</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  };
+
+  return `
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-hd"><h2>보고 기간 설정</h2></div>
+      <div class="card-bd">
+        <div class="form-row">
+          <div class="fg"><label>시작일</label><input type="date" value="${state.rptStart}" onchange="state.rptStart=this.value;render()"></div>
+          <div class="fg"><label>종료일</label><input type="date" value="${state.rptEnd}" onchange="state.rptEnd=this.value;render()"></div>
+          <span style="color:var(--text3);font-size:.82rem;align-self:center">총 ${rpt.count}건</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="st"><div class="lb">입금 합계</div><div class="vl inc">+${fmt(rpt.totalIn)}원</div></div>
+      <div class="st"><div class="lb">출금 합계</div><div class="vl exp">-${fmt(rpt.totalOut)}원</div></div>
+      <div class="st"><div class="lb">잔금</div><div class="vl bal">${fmt(rpt.balance)}원</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><h2>월별 입출금 현황</h2></div>
+      <div class="card-bd"><div class="chart-wrap"><canvas id="monthChart"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <h2>상세 보고서</h2>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <span style="font-size:.72rem;color:var(--text3)">💡 금액·내용 셀 더블클릭으로 수정</span>
+          <button class="btn btn-sm" style="background:#1565c0;color:#fff" onclick="copyReport()">📋 복사하기</button>
+          <button class="btn btn-sm" style="background:#0e3d19;color:#fff" onclick="printReport()">🖨 인쇄</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <div id="reportPrintArea">
+        ${renderSection('입금',rpt.income,true)}
+        ${renderSection('출금',rpt.expense,false)}
+        <table style="margin-top:1rem;table-layout:fixed;width:100%">
+          <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+          <tbody>
+          <tr style="background:var(--primary-light)"><td style="text-align:center;font-weight:700;padding:.7rem">입금</td><td style="text-align:right;font-weight:800;padding:.7rem;color:var(--primary)">${fmt(rpt.totalIn)}원</td></tr>
+          <tr style="background:var(--danger-light)"><td style="text-align:center;font-weight:700;padding:.7rem">출금</td><td style="text-align:right;font-weight:800;padding:.7rem;color:var(--danger)">${fmt(rpt.totalOut)}원</td></tr>
+          <tr class="rpt-grand"><td style="text-align:center;border-radius:0 0 0 6px">잔금</td><td style="text-align:right;border-radius:0 0 6px 0">${fmt(rpt.balance)}원</td></tr>
+          </tbody>
+        </table>
+        </div><!-- /reportPrintArea -->
+      </div>
+    </div>`;
+}
+
+// 보고서 셀 더블클릭 수정
+function editReportCell(e, idxOrList, field, isInc){
+  const td=e.currentTarget;
+  if(td.querySelector('input'))return;
+
+  // 합산 셀(idxList)은 금액 수정 불가 (읽기전용)
+  if(Array.isArray(idxOrList)){
+    showToast('합산 항목은 통장내역에서 개별 수정해주세요');
+    return;
+  }
+  const idx=idxOrList;
+  const row=BANK_DATA[idx];
+  if(!row)return;
+  const cur=field==='amount'?Math.abs(row.amount):(row[field]||'');
+  const inp=document.createElement('input');
+  inp.type=field==='amount'?'number':'text';
+  inp.value=cur;
+  inp.style.cssText='width:100%;font-size:.8rem;border:1px solid var(--primary);border-radius:3px;padding:.15rem .3rem;box-sizing:border-box';
+  const orig=td.innerHTML;
+  td.innerHTML='';td.appendChild(inp);inp.focus();if(inp.select)inp.select();
+  const commit=()=>{
+    const val=inp.value.trim();
+    if(field==='amount'){
+      const sign=row.amount>=0?1:-1;
+      row.amount=(parseInt(val)||0)*sign;
+      let bal=idx>0?BANK_DATA[idx-1].balance:0;
+      for(let i=idx;i<BANK_DATA.length;i++){BANK_DATA[i].balance=bal+BANK_DATA[i].amount;bal=BANK_DATA[i].balance;}
+    } else { row[field]=val; }
+    render();
+  };
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();commit();}if(ev.key==='Escape')td.innerHTML=orig;});
+  inp.addEventListener('blur',commit);
+}
+
+// ============================================================
+// 회비납부 팝업 (통장내역에서 이름 클릭)
+// ============================================================
+function showDuesPopup(name){
+  const member=MEMBER_DATA.find(m=>m.name===name);
+  if(!member){return;}
+  // 실제 납부 내역을 BANK_DATA에서 찾기
+  const payHistory=BANK_DATA.filter(t=>(t.category==='회비'||t.category==='연납')&&t.payer===name)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const isAnnual=member.m1==='연납';
+  let rows='';
+  if(isAnnual){
+    rows=`<div style="text-align:center;padding:1rem;background:var(--accent-light);border-radius:8px;font-weight:700;color:#7a5c00;margin-bottom:.5rem">🎉 연납 완료</div>`;
+  } else {
+    // 월별 납부 현황
+    for(let i=1;i<=12;i++){
+      const val=member['m'+i];
+      if(!val)continue;
+      // BANK_DATA에서 해당 월 납부 날짜 찾기
+      const matchTx=BANK_DATA.filter(t=>t.payer===name&&(t.category==='회비'||t.category==='연납')).find(t=>{
+        const txMonth=parseInt(t.date.split('.')[1]);
+        return txMonth===i;
+      });
+      const dateStr=matchTx?matchTx.date:'날짜 불명';
+      const isSpecial=['부상','군대','해외출장','육아','파견'].includes(val);
+      rows+=`<div class="dues-popup-row">
+        <span class="dues-popup-month">${i}월</span>
+        <span class="dues-popup-date">${isSpecial?'':dateStr}</span>
+        <span class="dues-popup-status" style="color:${isSpecial?'#4527a0':val==='O'||val==='20000'?'var(--primary)':'var(--danger)'}">${isSpecial?val:val==='O'||val==='20000'?'✅ 납부':'❌ 미납'}</span>
+      </div>`;
+    }
+    if(!rows)rows=`<div class="empty" style="padding:1rem">납부 내역이 없습니다</div>`;
+  }
+  // 총 납부금액
+  const totalPaid=payHistory.reduce((s,t)=>s+t.amount,0);
+
+  const popup=document.createElement('div');
+  popup.className='dues-popup';
+  popup.id='duesPopupOverlay';
+  popup.onclick=e=>{if(e.target===popup)popup.remove()};
+  popup.innerHTML=`
+    <div class="dues-popup-box">
+      <div class="dues-popup-hd">
+        <h3>💰 ${name} 납부 현황</h3>
+        <button class="modal-x" style="color:#fff" onclick="document.getElementById('duesPopupOverlay').remove()">✕</button>
+      </div>
+      <div class="dues-popup-body">
+        <div style="display:flex;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap">
+          <span class="bdg bdg-dues">${member.position}</span>
+          <span class="bdg bdg-etc">등번호 ${member.jersey}</span>
+          <span class="bdg" style="background:var(--primary-light);color:var(--primary)">총 납부 ${fmt(totalPaid)}원</span>
+        </div>
+        ${rows}
+      </div>
+    </div>`;
+  document.body.appendChild(popup);
+}
+
+// ============================================================
+// 회원 추가/수정 모달
+// ============================================================
+function calcAge(year){ return year ? new Date().getFullYear() - parseInt(year) + 1 : ''; }
+
+function openMemberModal(idx=null){
+  const isEdit=idx!==null;
+  const m=isEdit?MEMBER_DATA[idx]:{group:6,position:'회원',name:'',jersey:'',year:'',contact:'',annual_date:'',m1:'',m2:'',m3:'',m4:'',m5:'',m6:'',m7:'',m8:'',m9:'',m10:'',m11:'',m12:''};
+  const positions=['회장','부회장','감독','고문','총무','부총무','간사','코치','회원'];
+  const old=document.getElementById('memberModalOverlay');if(old)old.remove();
+  const overlay=document.createElement('div');
+  overlay.className='modal-bg';overlay.id='memberModalOverlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};
+  overlay.innerHTML=`
+    <div class="modal" style="max-width:520px">
+      <div class="modal-hd"><h3>${isEdit?'회원 수정':'회원 추가'}</h3><button class="modal-x" onclick="document.getElementById('memberModalOverlay').remove()">✕</button></div>
+      <div class="modal-bd">
+        <div class="form-row">
+          <div class="fg" style="flex:1"><label>이름 *</label><input id="mm_name" value="${m.name}" placeholder="이름"></div>
+          <div class="fg" style="flex:1"><label>등번호</label><input id="mm_jersey" type="number" value="${m.jersey||''}"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:1"><label>직책</label>
+            <select id="mm_pos">${positions.map(p=>`<option ${m.position===p?'selected':''}>${p}</option>`).join('')}</select>
+          </div>
+          <div class="fg" style="flex:1">
+            <label>출생연도</label>
+            <input id="mm_year" type="number" value="${m.year||''}" placeholder="1990"
+              oninput="document.getElementById('mm_age_preview').textContent=this.value?'→ '+(new Date().getFullYear()-parseInt(this.value)+1)+'세':''">
+          </div>
+          <div class="fg" style="flex:.6;justify-content:flex-end">
+            <label>&nbsp;</label>
+            <div id="mm_age_preview" style="padding:.45rem .4rem;font-size:.8rem;color:var(--primary);font-weight:700">${m.year?'→ '+calcAge(m.year)+'세':''}</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:1"><label>연락처</label><input id="mm_contact" value="${m.contact||''}" placeholder="010-0000-0000"></div>
+        </div>
+        <div style="font-size:.72rem;font-weight:600;color:var(--text3);margin:.5rem 0 .3rem">월별 납부 현황 (O=납부, 빈칸=미납, 연납/파견 등 직접입력)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem">
+          ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>`
+            <div class="fg"><label>${n}월</label><input id="mm_m${n}" value="${m['m'+n]||''}" placeholder="-" style="text-align:center"></div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="modal-ft" style="justify-content:space-between">
+        <div>
+          ${isEdit?`<button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="withdrawMember(${idx})">탈퇴 처리</button>`:''}
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-o" onclick="document.getElementById('memberModalOverlay').remove()">취소</button>
+          <button class="btn btn-p" onclick="saveMember(${isEdit?idx:'null'})">저장</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function saveMember(idx){
+  const name=document.getElementById('mm_name').value.trim();
+  if(!name){showToast('이름을 입력해주세요');return;}
+  const positions=['회장','부회장','감독','고문','총무','부총무','간사','코치','회원'];
+  const pos=document.getElementById('mm_pos').value;
+  const groupMap={'회장':0,'부회장':1,'감독':2,'고문':3,'총무':4,'부총무':4,'간사':4,'코치':5,'회원':6};
+  const year=parseInt(document.getElementById('mm_year').value)||'';
+  const newMember={
+    group:groupMap[pos]??6, position:pos, name,
+    jersey:parseInt(document.getElementById('mm_jersey').value)||0,
+    year, age: calcAge(year),
+    contact:document.getElementById('mm_contact').value.trim(),
+    annual_date:''
+  };
+  for(let i=1;i<=12;i++) newMember['m'+i]=document.getElementById('mm_m'+i).value.trim();
+  if(newMember.m1==='연납') newMember.annual_date=new Date().toISOString().slice(0,10);
+
+  if(idx==='null'||idx===null){
+    MEMBER_DATA.push(newMember);
+    showToast(`✅ ${name} 회원이 추가되었습니다`);
+  } else {
+    MEMBER_DATA[idx]=newMember;
+    showToast(`✅ ${name} 회원 정보가 수정되었습니다`);
+  }
+  document.getElementById('memberModalOverlay').remove();
+  render();
+}
+
+function withdrawMember(idx){
+  if(!confirm(`정말 탈퇴 처리하시겠습니까?\n탈퇴 회원 목록으로 이동됩니다.`))return;
+  const m=MEMBER_DATA.splice(idx,1)[0];
+  m.withdrawDate=new Date().toISOString().slice(0,10);
+  WITHDRAWN_DATA.push(m);
+  document.getElementById('memberModalOverlay').remove();
+  showToast(`${m.name} 회원이 탈퇴 처리됐습니다`);
+  state.memberSubTab='withdrawn';
+  render();
+}
+
+// ============================================================
+// 회비 직접편집 팝업
+// ============================================================
+function openDuesEditPopup(){
+  const old=document.getElementById('duesEditOverlay');if(old)old.remove();
+
+  const sorted=[...MEMBER_DATA].sort((a,b)=>{
+    if(a.group!==b.group) return a.group-b.group;
+    return a.name.localeCompare(b.name,'ko');
+  }).filter(m=>!isInactiveMember(m)); // 활동 회원만
+
+  const overlay=document.createElement('div');
+  overlay.className='modal-bg';overlay.id='duesEditOverlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};
+
+  const MNAMES=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  const statusOpts=['','O','연납','파견','부상','군대','해외출장','육아'];
+
+  overlay.innerHTML=`
+    <div class="modal" style="max-width:1100px;max-height:90vh;display:flex;flex-direction:column">
+      <div class="modal-hd">
+        <h3>✏️ 회비 직접 편집</h3>
+        <button class="modal-x" onclick="document.getElementById('duesEditOverlay').remove()">✕</button>
+      </div>
+      <div style="padding:.6rem 1rem;background:var(--info-light);font-size:.76rem;color:#0d47a1;line-height:1.6">
+        통장내역에서 자동으로 계산된 값이 기본으로 들어가 있어요. 직접 수정한 뒤 <b>저장</b>을 누르면 회비현황에 반영돼요.<br>
+        셀 값: <b>O</b>=납부 &nbsp;|&nbsp; <b>연납</b>=연납 &nbsp;|&nbsp; <b>파견/부상/군대/해외출장/육아</b>=특수상태 &nbsp;|&nbsp; <b>빈칸</b>=미납
+      </div>
+      <div style="overflow:auto;flex:1;padding:.75rem 1rem">
+        <table style="min-width:700px;font-size:.78rem;border-collapse:collapse">
+          <thead>
+            <tr style="background:#fafaf7">
+              <th style="padding:.5rem .6rem;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;position:sticky;left:0;background:#fafaf7">이름</th>
+              <th style="padding:.5rem .4rem;border-bottom:2px solid var(--border);white-space:nowrap">직책</th>
+              ${MNAMES.map(mn=>`<th style="padding:.5rem .4rem;border-bottom:2px solid var(--border);text-align:center;min-width:60px">${mn}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${sorted.map((m,ri)=>`
+              <tr style="border-bottom:1px solid #f0ede5" id="derow_${ri}">
+                <td style="padding:.4rem .6rem;font-weight:700;white-space:nowrap;position:sticky;left:0;background:#fff">${m.name}</td>
+                <td style="padding:.4rem .4rem;color:var(--text3);font-size:.72rem">${m.position}</td>
+                ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>{
+                  const val=m['m'+n]||'';
+                  const isAnn=val==='연납';
+                  const isPaid=val==='O';
+                  const isSpecial=['파견','부상','군대','해외출장','육아'].includes(val);
+                  const bg=isAnn?'var(--accent-light)':isPaid?'var(--primary-light)':isSpecial?'#ede7f6':'';
+                  const color=isAnn?'#7a5c00':isPaid?'var(--primary)':isSpecial?'#4527a0':'';
+                  return `<td style="padding:.3rem .2rem;text-align:center">
+                    <select data-ri="${ri}" data-mi="${n}" onchange="duesEditChange(this)"
+                      style="width:58px;font-size:.7rem;padding:.2rem;border:1px solid var(--border);border-radius:4px;font-family:inherit;background:${bg};color:${color};font-weight:600;cursor:pointer">
+                      ${statusOpts.map(o=>`<option ${o===val?'selected':''}>${o||'미납'}</option>`).join('')}
+                    </select>
+                  </td>`;
+                }).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-ft">
+        <div style="font-size:.75rem;color:var(--text3)">변경 후 저장해야 회비현황에 반영돼요</div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-o" onclick="document.getElementById('duesEditOverlay').remove()">닫기</button>
+          <button class="btn btn-p" onclick="saveDuesEdit()">💾 저장 및 반영</button>
+        </div>
+      </div>
+    </div>`;
+
+  // sorted 배열을 overlay에 저장 (saveDuesEdit에서 참조)
+  overlay._sortedMembers = sorted;
+  document.body.appendChild(overlay);
+}
+
+function duesEditChange(sel){
+  // 선택값에 따라 셀 배경색 즉시 반영
+  const val=sel.value==='미납'?'':sel.value;
+  const isAnn=val==='연납', isPaid=val==='O';
+  const isSpecial=['파견','부상','군대','해외출장','육아'].includes(val);
+  sel.style.background=isAnn?'var(--accent-light)':isPaid?'var(--primary-light)':isSpecial?'#ede7f6':'';
+  sel.style.color=isAnn?'#7a5c00':isPaid?'var(--primary)':isSpecial?'#4527a0':'';
+}
+
+function saveDuesEdit(){
+  const overlay=document.getElementById('duesEditOverlay');
+  const sorted=overlay._sortedMembers;
+  const sels=overlay.querySelectorAll('select[data-ri]');
+  sels.forEach(sel=>{
+    const ri=parseInt(sel.dataset.ri);
+    const mi=parseInt(sel.dataset.mi);
+    const val=sel.value==='미납'?'':sel.value;
+    const m=sorted[ri];
+    if(m) m['m'+mi]=val;
+  });
+  overlay.remove();
+  showToast('✅ 회비 내역이 반영됐어요');
+  render();
+}
+
+// ============================================================
+// 등번호 탭
+// ============================================================
+function renderJerseyPage(){
+  const jerseys=(state.backNumbers||[]).slice().sort((a,b)=>a.jersey-b.jersey);
+  const map={};
+  jerseys.forEach(j=>{map[j.jersey]=j.name;});
+  const memberNames=new Set(MEMBER_DATA.map(m=>m.name));
+
+  // 불일치: 등번호에만 있고 회원관리에 없는 사람
+  const jerseyOnly=jerseys.filter(j=>{
+    const clean=j.name.replace(/\(\d+\)/,'').trim();
+    return !memberNames.has(clean)&&!memberNames.has(j.name);
+  });
+  // 회원관리에 있는데 등번호 미배정
+  const memberOnly=MEMBER_DATA.filter(m=>
+    m.group<7&&(!m.jersey||m.jersey===0||!jerseys.find(j=>j.name.replace(/\(\d+\)/,'').trim()===m.name||j.name===m.name))
+  );
+
+  // 10×10 격자 (1~99, 마지막 행 9칸)
+  const COLS=10;
+  const gridRows=[];
+  for(let i=1;i<=99;i+=COLS) gridRows.push(Array.from({length:COLS},(_,k)=>i+k).filter(n=>n<=99));
+
+  return `
+    <div class="card">
+      <div class="card-hd">
+        <h2>🔢 등번호 현황</h2>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <span style="font-size:.72rem;color:var(--text3)">💡 셀 더블클릭으로 수정</span>
+          ${_accessToken?`<button class="btn btn-sm" style="background:#fbbc04;color:#000" onclick="saveJerseyToSheet()">💾 시트 저장</button>`:''}
+        </div>
+      </div>
+      <div class="card-bd" style="overflow-x:auto">
+        <table style="table-layout:fixed;width:100%;min-width:560px;border-collapse:collapse">
+          <colgroup>${Array.from({length:COLS},()=>'<col style="width:10%">').join('')}</colgroup>
+          <tbody>
+            ${gridRows.map(row=>`<tr>${row.map(n=>{
+              const name=map[n]||'';
+              const clean=name.replace(/\(\d+\)/,'').trim();
+              const inMem=name&&(memberNames.has(name)||memberNames.has(clean));
+              const bg=!name?'#fafaf7':inMem?'var(--primary-light)':'#fff3cd';
+              const nc=!name?'#ccc':inMem?'var(--primary)':'#e65100';
+              return `<td ondblclick="editJerseyCell(event,${n})"
+                style="text-align:center;padding:.4rem .1rem;border:1px solid #eee;background:${bg};cursor:cell;vertical-align:middle">
+                <div style="font-size:.65rem;color:var(--text3);font-weight:600;line-height:1">${n}</div>
+                <div style="font-size:.76rem;font-weight:${name?700:400};color:${nc};margin-top:.1rem;line-height:1.2;word-break:keep-all">${name||'—'}</div>
+              </td>`;
+            }).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    ${jerseyOnly.length>0||memberOnly.length>0?`
+    <div class="card" style="border:2px solid #ff9800">
+      <div class="card-hd" style="background:#fff8e1"><h2 style="color:#e65100">⚠️ 불일치</h2></div>
+      <div class="card-bd">
+        ${jerseyOnly.length>0?`<div style="margin-bottom:.6rem">
+          <div style="font-size:.77rem;font-weight:700;color:#e65100;margin-bottom:.3rem">등번호에만 있고 회원관리에 없음 (${jerseyOnly.length}명)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem">${jerseyOnly.map(j=>`<span style="background:#fff3cd;border:1px solid #ffb300;border-radius:4px;padding:.2rem .5rem;font-size:.77rem;font-weight:600">${j.jersey}번 ${j.name}</span>`).join('')}</div>
+        </div>`:''}
+        ${memberOnly.length>0?`<div>
+          <div style="font-size:.77rem;font-weight:700;color:#1565c0;margin-bottom:.3rem">회원관리에 있는데 등번호 미배정 (${memberOnly.length}명)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem">${memberOnly.map(m=>`<span style="background:#e3f2fd;border:1px solid #1565c0;border-radius:4px;padding:.2rem .5rem;font-size:.77rem;font-weight:600">${m.name}</span>`).join('')}</div>
+        </div>`:''}
+      </div>
+    </div>`:''}
+
+    <div class="card">
+      <div class="card-hd"><h2>등번호 목록 (1~99)</h2></div>
+      <div class="card-bd">
+        <div style="display:flex;flex-wrap:wrap;gap:.15rem .4rem">
+          ${Array.from({length:99},(_,i)=>i+1).map(n=>{
+            const name=map[n]||'';
+            const clean=name.replace(/\(\d+\)/,'').trim();
+            const inMem=name&&(memberNames.has(name)||memberNames.has(clean));
+            const color=name?(inMem?'var(--primary)':'#e65100'):'#bbb';
+            return `<span style="font-size:.8rem;white-space:nowrap">
+              <span style="color:var(--text3);font-weight:600">${n}.</span>
+              <span style="font-weight:${name?700:400};color:${color}">${name||'—'}</span>
+            </span>`;
+          }).join('<span style="color:#ddd;margin:0 .1rem">│</span>')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function editJerseyCell(e,jerseyNum){
+  const td=e.currentTarget;
+  if(td.querySelector('input'))return;
+  const cur=(state.backNumbers||[]).find(j=>j.jersey===jerseyNum);
+  const inp=document.createElement('input');
+  inp.type='text'; inp.value=cur?cur.name:'';
+  inp.placeholder='이름 (빈칸=삭제)';
+  inp.style.cssText='width:100%;font-size:.73rem;border:1px solid var(--primary);border-radius:3px;padding:.1rem;text-align:center;box-sizing:border-box';
+  const orig=td.innerHTML; td.innerHTML=''; td.appendChild(inp); inp.focus(); inp.select();
+  const commit=()=>{
+    const newName=inp.value.trim();
+    if(!state.backNumbers) state.backNumbers=[];
+    const idx=state.backNumbers.findIndex(j=>j.jersey===jerseyNum);
+    if(newName===''){if(idx>=0)state.backNumbers.splice(idx,1);}
+    else if(idx>=0) state.backNumbers[idx].name=newName;
+    else state.backNumbers.push({jersey:jerseyNum,name:newName});
+    // MEMBER_DATA 동기
+    if(newName){const m=MEMBER_DATA.find(m=>m.name===newName||m.name===newName.replace(/\(\d+\)/,'').trim());if(m)m.jersey=jerseyNum;}
+    render();
+  };
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();commit();}if(ev.key==='Escape')td.innerHTML=orig;});
+  inp.addEventListener('blur',commit);
+}
+
+async function saveJerseyToSheet(){
+  if(!_accessToken){showToast('⚠️ 구글 시트에 연결 후 저장해주세요');return;}
+  const sorted=(state.backNumbers||[]).slice().sort((a,b)=>a.jersey-b.jersey);
+  if(sorted.length===0){showToast('⚠️ 저장할 등번호 데이터가 없어요. 새로고침 후 다시 시도해주세요');return;}
+  showToast('📤 등번호 저장 중...');
+  try{
+    const rows=sorted.map(j=>[j.name, j.jersey]);
+    const res=await gasGetSave('saveBackNumber',{rows});
+    showToast('✅ '+(res.msg||'등번호 저장 완료')+' ('+rows.length+'건)');
+  }catch(e){showToast('❌ 저장 실패: '+e.message);}
+}
+
+function renderMembersPage(){
+  const active=getActiveMembers();
+  const inactive=getInactiveMembers();
+  const sub=state.memberSubTab||'active';
+  const sort=state.memberSort||'seq';
+
+  // 정렬 적용
+  // 비활동 회원은 항상 맨 아래
+  const sortedData=[...MEMBER_DATA].sort((a,b)=>{
+    const aInactive=isInactiveMember(a)?1:0, bInactive=isInactiveMember(b)?1:0;
+    if(aInactive!==bInactive) return aInactive-bInactive;
+    if(sort==='name') return a.name.localeCompare(b.name,'ko');
+    if(a.group!==b.group) return a.group-b.group;
+    return a.name.localeCompare(b.name,'ko');
+  });
+
+  // 순번: group별 카운터로 자동 생성
+  let seqCounter=0;
+  const seqMap=new Map();
+  sortedData.forEach(m=>{seqCounter++;seqMap.set(m,seqCounter);});
+
+  const activeContent=`
+    <div class="card">
+      <div class="card-hd">
+        <h2>회원 명부</h2>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <div style="display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;font-size:.75rem">
+            <button onclick="state.memberSort='seq';render()" style="padding:.3rem .7rem;border:none;cursor:pointer;font-family:inherit;font-weight:600;${sort==='seq'?'background:var(--primary);color:#fff':'background:#fff;color:var(--text2)'}">순번순</button>
+            <button onclick="state.memberSort='name';render()" style="padding:.3rem .7rem;border:none;cursor:pointer;font-family:inherit;font-weight:600;border-left:1px solid var(--border);${sort==='name'?'background:var(--primary);color:#fff':'background:#fff;color:var(--text2)'}">가나다순</button>
+          </div>
+          ${_accessToken?`<button class="btn btn-sm" style="background:#fbbc04;color:#000" onclick="saveMembersToSheet()">💾 시트 저장</button>`:''}
+          <button class="btn btn-sm" style="background:#6a1b9a;color:#fff" onclick="openDuesEditPopup()">✏️ 회비 편집</button>
+          <button class="btn btn-p btn-sm" onclick="openMemberModal()">＋ 회원 추가</button>
+        </div>
+      </div>
+      <div class="card-bd">
+        <table>
+          <thead><tr><th>순번</th><th>이름</th><th>번호</th><th>직책</th><th>연도</th><th>나이</th><th>연락처</th><th>납부상태</th><th>상세상태</th><th>관리</th></tr></thead>
+          <tbody>${sortedData.map((m)=>{
+            const seq=seqMap.get(m);
+            const isAnn=m.m1==='연납';
+            const isInactive=isInactiveMember(m);
+            const paidCount=isAnn?12:[1,2,3,4,5,6,7,8,9,10,11,12].filter(n=>{const v=m['m'+n];return v==='O'||v==='20000';}).length;
+            let statusBdg='';
+            if(isInactive){
+              const reason=getInactiveReason(m);
+              statusBdg=`<span class="bdg" style="background:#f3e5f5;color:#6a1b9a">${reason}</span>`;
+            }
+            else if(isAnn)statusBdg=`<span class="bdg bdg-ann">연납</span>`;
+            else if(paidCount>0)statusBdg=`<span class="bdg bdg-dues">${paidCount}개월</span>`;
+            else statusBdg=`<span class="bdg bdg-exp">미납</span>`;
+            const origIdx=MEMBER_DATA.indexOf(m);
+            // 상세상태: group 0~6은 정상/비활동사유 선택, group 7은 비활동사유만
+            const curStatus = m.status || (isInactive ? getInactiveReason(m) : '정상');
+            const statusCell = `<td>
+              <select onchange="updateMemberStatus(${origIdx},this.value)"
+                style="font-size:.75rem;padding:.2rem .4rem;border:1px solid var(--border);border-radius:4px;font-family:inherit;background:${curStatus!=='정상'?'#f3e5f5':'var(--primary-light)'};color:${curStatus!=='정상'?'#6a1b9a':'var(--primary)'};font-weight:600;cursor:pointer">
+                <option ${curStatus==='정상'?'selected':''}>정상</option>
+                <option ${curStatus==='부상'?'selected':''}>부상</option>
+                <option ${curStatus==='군대'?'selected':''}>군대</option>
+                <option ${curStatus==='해외출장'?'selected':''}>해외출장</option>
+                <option ${curStatus==='육아'?'selected':''}>육아</option>
+                <option ${curStatus==='파견'?'selected':''}>파견</option>
+                <option ${curStatus==='기타'?'selected':''}>기타</option>
+              </select>
+            </td>`;
+            return `<tr style="${isInactive?'opacity:.72':''}">
+              <td style="color:var(--text3);font-size:.78rem">${seq}</td>
+              <td style="font-weight:600">${m.name}</td>
+              <td>${m.jersey}</td>
+              <td ondblclick="editPositionCell(event,${origIdx})" style="cursor:cell">${m.position}</td>
+              <td>${m.year||''}</td>
+              <td>${m.year?calcAge(m.year):''}</td>
+              <td style="font-size:.78rem">${m.contact}</td>
+              <td>${statusBdg}</td>
+              ${statusCell}
+              <td><button class="btn btn-o btn-sm" onclick="openMemberModal(${origIdx})">수정</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  const withdrawnContent=`
+    <div class="card">
+      <div class="card-hd"><h2>탈퇴 회원 명부</h2><span style="font-size:.8rem;color:var(--text3)">${WITHDRAWN_DATA.length}명</span></div>
+      <div class="card-bd">
+        ${WITHDRAWN_DATA.length===0?'<div class="empty">탈퇴 회원이 없습니다</div>':`
+        <table>
+          <thead><tr><th>#</th><th>이름</th><th>번호</th><th>직책</th><th>연도</th><th>연락처</th><th>탈퇴일</th><th>관리</th></tr></thead>
+          <tbody>${WITHDRAWN_DATA.map((m,i)=>`<tr style="opacity:.6">
+            <td>${i+1}</td>
+            <td style="font-weight:600">${m.name}</td>
+            <td>${m.jersey}</td>
+            <td>${m.position}</td>
+            <td>${m.year||''}</td>
+            <td style="font-size:.78rem">${m.contact}</td>
+            <td style="font-size:.78rem;color:var(--text3)">${m.withdrawDate||''}</td>
+            <td><button class="btn btn-o btn-sm" onclick="restoreMember(${i})">복귀</button></td>
+          </tr>`).join('')}</tbody>
+        </table>`}
+      </div>
+    </div>`;
+
+  return `
+    <div class="stats">
+      <div class="st"><div class="lb">전체 회원</div><div class="vl">${MEMBER_DATA.length}명</div></div>
+      <div class="st"><div class="lb">활동 회원</div><div class="vl inc">${active.length}명</div></div>
+      <div class="st"><div class="lb">비활동 회원</div><div class="vl" style="color:var(--text3)">${inactive.length}명</div></div>
+      <div class="st"><div class="lb">탈퇴 회원</div><div class="vl" style="color:#6a1b9a">${WITHDRAWN_DATA.length}명</div></div>
+    </div>
+    <div class="sub-tabs">
+      <button class="sub-tab ${sub==='active'?'on':''}" onclick="state.memberSubTab='active';render()">활동·비활동 회원</button>
+      <button class="sub-tab ${sub==='withdrawn'?'on':''}" onclick="state.memberSubTab='withdrawn';render()">🚪 탈퇴 회원 ${WITHDRAWN_DATA.length>0?`<span style="background:var(--danger);color:#fff;border-radius:10px;padding:.05rem .4rem;font-size:.7rem;margin-left:.2rem">${WITHDRAWN_DATA.length}</span>`:''}
+      </button>
+    </div>
+    ${sub==='active'?activeContent:withdrawnContent}`;
+}
+
+function restoreMember(idx){
+  const m=WITHDRAWN_DATA.splice(idx,1)[0];
+  delete m.withdrawDate;
+  if(!m.status) m.status='정상';
+  MEMBER_DATA.push(m);
+  showToast(`✅ ${m.name} 회원이 복귀됐습니다`);
+  state.memberSubTab='active';
+  render();
+}
+
+// 상세상태 드롭박스 변경 시 즉시 반영
+function updateMemberStatus(idx, val){
+  const m = MEMBER_DATA[idx];
+  if (!m) return;
+  m.status = val;
+  // 비활동 상태로 바꾸면 group을 7로, 정상이면 직책에 맞게 복원
+  const pg = {'회장':0,'부회장':1,'감독':2,'고문':3,'총무':4,'부총무':4,'간사':4,'코치':5,'회원':6};
+  if (val !== '정상') {
+    m.group = 7;
+  } else {
+    m.group = pg[m.position] ?? 6;
+  }
+  showToast(`${m.name} 상태: ${val}`);
+  render();
+}
+
+function editPositionCell(e, idx){
+  const td=e.currentTarget;
+  if(td.querySelector('select'))return;
+  const m=MEMBER_DATA[idx];
+  if(!m)return;
+  const positions=['회장','부회장','감독','고문','총무','부총무','간사','코치','회원'];
+  const groupMap={'회장':0,'부회장':1,'감독':2,'고문':3,'총무':4,'부총무':4,'간사':4,'코치':5,'회원':6};
+  const sel=document.createElement('select');
+  sel.style.cssText='width:100%;font-size:.8rem;border:2px solid var(--primary);border-radius:4px;padding:.25rem .3rem;font-family:inherit;cursor:pointer;background:#fff';
+  positions.forEach(p=>{
+    const opt=document.createElement('option');
+    opt.value=p;opt.textContent=p;
+    if(m.position===p)opt.selected=true;
+    sel.appendChild(opt);
+  });
+  const orig=td.innerHTML;
+  td.innerHTML='';td.appendChild(sel);sel.focus();
+  const commit=()=>{
+    const newPos=sel.value;
+    m.position=newPos;
+    m.group=groupMap[newPos]??6;
+    if(isInactiveMember(m)) m.group=7;
+    showToast(`✅ ${m.name} 직책 → ${newPos}`);
+    render();
+  };
+  sel.addEventListener('change',commit);
+  sel.addEventListener('blur',()=>{setTimeout(()=>{if(td.contains(sel))commit();},100);});
+  sel.addEventListener('keydown',ev=>{if(ev.key==='Escape'){td.innerHTML=orig;}});
+}
+
+
+// ============================================================
+// 통장 내역 추가 모달
+// ============================================================
+function renderAddModal(){
+  const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+  return `
+  <div id="addModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeAddModal()">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-hd"><h3>거래 내역 추가</h3><button class="modal-x" onclick="closeAddModal()">✕</button></div>
+      <div class="modal-bd">
+        <div class="form-row">
+          <div class="fg" style="flex:1"><label>날짜</label><input type="date" id="m_date" value="${new Date().toISOString().slice(0,10)}"></div>
+          <div class="fg" style="flex:1"><label>이름/출처</label><input type="text" id="m_payer" placeholder="홍길동" oninput="onPayerInput()"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:1">
+            <label>카테고리</label>
+            <select id="m_cat" onchange="onCatChange()">
+              ${cats.map(c=>`<option>${c}</option>`).join('')}
+              <option value="__new__">직접 입력...</option>
+            </select>
+          </div>
+          <div class="fg" style="flex:1" id="m_newcat_wrap" style="display:none">
+            <label>새 카테고리</label><input type="text" id="m_newcat" placeholder="카테고리명">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:1"><label>내용</label><input type="text" id="m_content" placeholder="1월 회비 등"></div>
+          <div class="fg" style="flex:1"><label>비고</label><input type="text" id="m_note" placeholder="선택사항"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg" style="flex:1">
+            <label>구분</label>
+            <select id="m_type">
+              <option value="in">입금 (+)</option>
+              <option value="out">출금 (-)</option>
+            </select>
+          </div>
+          <div class="fg" style="flex:1"><label>금액 (원)</label><input type="number" id="m_amount" placeholder="20000" min="0"></div>
+        </div>
+        <!-- 회비내역 보기 버튼 + 납부현황 패널 -->
+        <div id="m_dues_wrap" style="display:none;margin-top:.5rem">
+          <button class="btn btn-o btn-sm" type="button" onclick="toggleDuesPreview()" id="m_dues_btn">📋 회비내역 보기</button>
+          <div id="m_dues_panel" style="display:none;margin-top:.5rem;background:var(--bg);border-radius:8px;padding:.7rem;font-size:.78rem;max-height:180px;overflow-y:auto"></div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-o" onclick="closeAddModal()">취소</button>
+        <button class="btn btn-p" onclick="submitAddModal()">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 일괄 추가 모달 -->
+  <div id="bulkModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closeBulkModal()">
+    <div class="modal" style="max-width:98vw;width:1100px;max-height:92vh;display:flex;flex-direction:column">
+      <div class="modal-hd"><h3>📋 일괄 내역 추가</h3><button class="modal-x" onclick="closeBulkModal()">✕</button></div>
+      <div class="modal-bd" style="overflow-y:auto;flex:1">
+        <div style="font-size:.75rem;margin-bottom:.6rem;background:#e8f0fe;padding:.5rem .8rem;border-radius:6px;color:#1a237e">
+          날짜, 이름, 카테고리, 내용, 금액, 입출금 순으로 입력하세요. 회비 선택 시 납부현황이 자동으로 표시돼요.
+        </div>
+        <!-- 헤더 -->
+        <div style="display:grid;grid-template-columns:130px 110px 110px 1fr 100px 80px 32px;gap:.3rem;margin-bottom:.2rem;padding:0 .1rem">
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">날짜</span>
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">이름</span>
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">카테고리</span>
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">내용</span>
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">금액</span>
+          <span style="font-size:.72rem;font-weight:600;color:var(--text3)">구분</span>
+          <span></span>
+        </div>
+        <div id="bulk_rows"></div>
+        <!-- 납부현황 미리보기 패널 -->
+        <div id="bulk_dues_preview" style="display:none;margin-top:.5rem;background:#f0f7f2;border-radius:8px;padding:.7rem;font-size:.78rem"></div>
+        <button class="btn btn-o btn-sm" style="margin-top:.5rem;width:100%" onclick="addBulkRow()">＋ 행 추가</button>
+      </div>
+      <div class="modal-ft">
+        <button class="btn btn-o" onclick="closeBulkModal()">취소</button>
+        <button class="btn btn-p" onclick="submitBulkModal()">전체 추가</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function onCatChange(){
+  const cat=document.getElementById('m_cat').value;
+  const wrap=document.getElementById('m_newcat_wrap');
+  if(wrap)wrap.style.display=cat==='__new__'?'flex':'none';
+  const duesWrap=document.getElementById('m_dues_wrap');
+  if(duesWrap)duesWrap.style.display=(cat==='회비'||cat==='연납')?'block':'none';
+  // 카테고리 변경 시 납부현황 자동 업데이트
+  const panel=document.getElementById('m_dues_panel');
+  if(panel&&panel.style.display!=='none') renderDuesPreview();
+}
+
+function onPayerInput(){
+  const panel=document.getElementById('m_dues_panel');
+  if(panel&&panel.style.display!=='none') renderDuesPreview();
+}
+
+function toggleDuesPreview(){
+  const panel=document.getElementById('m_dues_panel');
+  const btn=document.getElementById('m_dues_btn');
+  if(!panel)return;
+  if(panel.style.display==='none'){
+    panel.style.display='block';
+    btn.textContent='📋 회비내역 닫기';
+    renderDuesPreview();
+  } else {
+    panel.style.display='none';
+    btn.textContent='📋 회비내역 보기';
+  }
+}
+
+function renderDuesPreview(){
+  const panel=document.getElementById('m_dues_panel');
+  if(!panel)return;
+  const name=(document.getElementById('m_payer').value||'').trim();
+  if(!name){panel.innerHTML='<div style="color:var(--text3)">이름을 입력하면 납부현황이 표시돼요</div>';return;}
+  const member=MEMBER_DATA.find(m=>m.name===name);
+  if(!member){panel.innerHTML=`<div style="color:var(--text3)"><b>${name}</b> 회원을 찾을 수 없어요</div>`;return;}
+  if(member.m1==='연납'){
+    panel.innerHTML=`<div style="font-weight:700;color:var(--accent)">🎉 ${name} — 연납 완료</div>`;
+    return;
+  }
+  const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  let html=`<div style="font-weight:700;margin-bottom:.4rem">${name} 납부현황</div><div style="display:flex;flex-wrap:wrap;gap:.3rem">`;
+  let lastPaid=0;
+  MONTHS.forEach((_,i)=>{
+    const v=member['m'+(i+1)];
+    let bg='#f0f0f0',color='#999',label='-';
+    if(v==='O'||v==='20000'){bg='var(--primary-light)';color='var(--primary)';label='✅';lastPaid=i+1;}
+    else if(['파견','부상','군대','해외출장','육아'].includes(v)){bg='#ede7f6';color='#4527a0';label=v;}
+    html+=`<div style="background:${bg};color:${color};padding:.2rem .45rem;border-radius:4px;font-size:.72rem;font-weight:600">${i+1}월${label!=='-'?' '+label:''}</div>`;
+  });
+  html+='</div>';
+  if(lastPaid>0) html+=`<div style="margin-top:.4rem;font-size:.75rem;color:var(--primary);font-weight:700">→ ${lastPaid}월까지 납부 완료</div>`;
+  else html+=`<div style="margin-top:.4rem;font-size:.75rem;color:var(--danger);font-weight:700">→ 아직 납부 내역 없음</div>`;
+  panel.innerHTML=html;
+}
+
+function openAddModal(){
+  const m=document.getElementById('addModal');
+  if(m)m.style.display='flex';
+}
+function closeAddModal(){
+  const m=document.getElementById('addModal');
+  if(m)m.style.display='none';
+}
+function submitAddModal(){
+  const dateRaw=document.getElementById('m_date').value;
+  const payer=document.getElementById('m_payer').value.trim();
+  const catSel=document.getElementById('m_cat').value;
+  const catNew=document.getElementById('m_newcat').value.trim();
+  const category=catSel==='__new__'?(catNew||'기타'):catSel;
+  const content=document.getElementById('m_content').value.trim();
+  const note=document.getElementById('m_note').value.trim();
+  const type=document.getElementById('m_type').value;
+  const amtRaw=parseInt(document.getElementById('m_amount').value)||0;
+  if(!dateRaw||!payer||amtRaw<=0){showToast('날짜, 이름, 금액을 확인해주세요');return;}
+  const amount=type==='out'?-amtRaw:amtRaw;
+  const dateFmt=dateRaw.replace(/-/g,'.');
+  const lastBal=BANK_DATA.length?BANK_DATA[BANK_DATA.length-1].balance:0;
+  const newBal=lastBal+amount;
+  BANK_DATA.push({date:dateFmt,amount,payer,category,content,note,balance:newBal});
+  calcDuesFromBank();
+  closeAddModal();
+  showToast(`✅ 내역이 추가되었습니다 (잔액: ${fmt(newBal)}원)`);
+  render();
+}
+
+// ── 삭제
+function deleteRow(idx){
+  if(!confirm(`"${BANK_DATA[idx].payer}" ${fmt(BANK_DATA[idx].amount)}원 내역을 삭제할까요?`))return;
+  BANK_DATA.splice(idx,1);
+  // 삭제 이후 잔액 재계산
+  let bal=idx>0?BANK_DATA[idx-1].balance:0;
+  for(let i=idx;i<BANK_DATA.length;i++){
+    BANK_DATA[i].balance=bal+BANK_DATA[i].amount;
+    bal=BANK_DATA[i].balance;
+  }
+  calcDuesFromBank();
+  showToast('🗑 내역이 삭제됐어요');
+  render();
+}
+
+// ── 일괄 추가
+function openBulkModal(){
+  const m=document.getElementById('bulkModal');
+  if(!m)return;
+  const rows=document.getElementById('bulk_rows');
+  rows.innerHTML='';
+  for(let i=0;i<10;i++) addBulkRow();
+  const preview=document.getElementById('bulk_dues_preview');
+  if(preview) preview.style.display='none';
+  m.style.display='flex';
+}
+function closeBulkModal(){
+  const m=document.getElementById('bulkModal');
+  if(m)m.style.display='none';
+}
+function addBulkRow(){
+  const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+  const today=new Date().toISOString().slice(0,10).replace(/-/g,'.');
+  const div=document.createElement('div');
+  div.className='bulk-row';
+  div.style.cssText='display:grid;grid-template-columns:130px 110px 110px 1fr 100px 80px 32px;gap:.3rem;margin-bottom:.25rem;align-items:center';
+
+  const inpStyle='padding:.35rem .5rem;border:1px solid var(--border);border-radius:4px;font-size:.78rem;font-family:inherit;width:100%;box-sizing:border-box';
+  const catOptions=cats.map(c=>`<option>${c}</option>`).join('');
+
+  div.innerHTML=`
+    <input placeholder="2026.03.15" value="${today}" style="${inpStyle}">
+    <input placeholder="이름" style="${inpStyle}" oninput="onBulkRowChange(this)">
+    <select style="${inpStyle}" onchange="onBulkRowChange(this)">
+      ${catOptions}
+    </select>
+    <input placeholder="내용 (예: 3월)" style="${inpStyle}" oninput="onBulkRowChange(this)">
+    <input placeholder="금액" type="number" style="${inpStyle}">
+    <select style="${inpStyle}">
+      <option value="in">입금</option><option value="out">출금</option>
+    </select>
+    <button onclick="this.parentElement.remove();hideBulkDuesPreview()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;padding:.2rem">✕</button>`;
+  document.getElementById('bulk_rows').appendChild(div);
+}
+
+function onBulkRowChange(el){
+  // 현재 포커스된 row에서 이름과 카테고리 추출
+  const row=el.closest('.bulk-row');
+  if(!row)return;
+  const inputs=row.querySelectorAll('input,select');
+  const name=inputs[1].value.trim();
+  const cat=inputs[2].value;
+  const content=inputs[3].value.trim();
+
+  // 회비/연납 카테고리이거나 내용에 회비 관련 키워드 있을 때
+  const isDues=(cat==='회비'||cat==='연납'||(content&&content.includes('월')));
+  if(isDues&&name){
+    showBulkDuesPreview(name);
+  } else if(!name){
+    hideBulkDuesPreview();
+  }
+}
+
+function showBulkDuesPreview(name){
+  const panel=document.getElementById('bulk_dues_preview');
+  if(!panel)return;
+  const member=MEMBER_DATA.find(m=>m.name===name);
+  if(!member){
+    panel.style.display='block';
+    panel.innerHTML=`<span style="color:var(--text3)"><b>${name}</b> — 회원 데이터 없음</span>`;
+    return;
+  }
+  if(member.m1==='연납'){
+    panel.style.display='block';
+    panel.innerHTML=`<b style="color:var(--accent)">🎉 ${name} — 연납 완료</b>`;
+    return;
+  }
+  const MNAMES=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  let lastPaid=0;
+  let cells=MNAMES.map((_,i)=>{
+    const v=member['m'+(i+1)];
+    const paid=v==='O'||v==='20000';
+    const special=['파견','부상','군대','해외출장','육아'].includes(v);
+    if(paid) lastPaid=i+1;
+    const bg=paid?'var(--primary-light)':special?'#ede7f6':'#f0f0f0';
+    const color=paid?'var(--primary)':special?'#4527a0':'#aaa';
+    const label=paid?'✅':special?v:'-';
+    return `<span style="background:${bg};color:${color};border-radius:3px;padding:.1rem .3rem;font-size:.72rem;font-weight:600">${i+1}월 ${label}</span>`;
+  }).join('');
+  panel.style.display='block';
+  panel.innerHTML=`
+    <div style="font-weight:700;margin-bottom:.4rem">${name} 납부현황
+      ${lastPaid>0?`<span style="color:var(--primary);font-size:.8rem;margin-left:.5rem">→ ${lastPaid}월까지 완료</span>`:'<span style="color:var(--danger);font-size:.8rem;margin-left:.5rem">→ 납부 내역 없음</span>'}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:.25rem">${cells}</div>`;
+}
+
+function hideBulkDuesPreview(){
+  const panel=document.getElementById('bulk_dues_preview');
+  if(panel) panel.style.display='none';
+}
+function submitBulkModal(){
+  const rows=[...document.querySelectorAll('.bulk-row')];
+  let added=0,lastBal=BANK_DATA.length?BANK_DATA[BANK_DATA.length-1].balance:0;
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input,select');
+    const date=inputs[0].value.trim();
+    const payer=inputs[1].value.trim();
+    const category=inputs[2].value;
+    const content=inputs[3].value.trim();
+    const amtRaw=parseInt(inputs[4].value)||0;
+    const type=inputs[5].value;
+    if(!date||!payer||amtRaw<=0)return;
+    const amount=type==='out'?-amtRaw:amtRaw;
+    lastBal+=amount;
+    BANK_DATA.push({date,amount,payer,category,content,note:'',balance:lastBal});
+    added++;
+  });
+  if(added===0){showToast('추가할 내역을 입력해주세요');return;}
+  calcDuesFromBank();
+  closeBulkModal();
+  showToast(`✅ ${added}건 추가됐어요 (잔액: ${fmt(lastBal)}원)`);
+  render();
+}
+
+// ============================================================
+// 회비현황 내보내기 (PDF / JPG / 클립보드)
+// ============================================================
+function exportDues(type){
+  const active=getActiveMembers();
+  // html2canvas로 캡처
+  const target=document.getElementById('duesExportArea');
+  if(!target){showToast('내보낼 영역을 찾을 수 없습니다');return;}
+  if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중...');return;}
+  showToast('캡처 중...');
+  html2canvas(target,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
+    if(type==='clipboard'){
+      canvas.toBlob(blob=>{
+        try{
+          navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>showToast('📋 클립보드에 복사됐어요! 카톡에 붙여넣기 하세요'));
+        }catch(e){showToast('클립보드 복사 실패 (브라우저 제한)');}
+      });
+    } else if(type==='jpg'){
+      const a=document.createElement('a');
+      a.download='넉살FC_회비현황.jpg';
+      a.href=canvas.toDataURL('image/jpeg',0.95);
+      a.click();
+      showToast('JPG 다운로드 완료');
+    } else if(type==='pdf'){
+      if(typeof jspdf==='undefined'&&typeof window.jspdf==='undefined'){showToast('PDF 라이브러리 로딩 중...');return;}
+      const {jsPDF}=window.jspdf;
+      const imgData=canvas.toDataURL('image/jpeg',0.95);
+      const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+      const pw=pdf.internal.pageSize.getWidth();
+      const ph=pdf.internal.pageSize.getHeight();
+      const ratio=canvas.width/canvas.height;
+      let iw=pw-10,ih=iw/ratio;
+      if(ih>ph-10){ih=ph-10;iw=ih*ratio;}
+      pdf.addImage(imgData,'JPEG',5,5,iw,ih);
+      pdf.save('넉살FC_회비현황.pdf');
+      showToast('PDF 다운로드 완료');
+    }
+  });
+}
+
+// ============================================================
+// 예산보고서 상세보고서 프린트
+// ============================================================
+function printReport(){
+  const content=document.getElementById('reportPrintArea');
+  if(!content){showToast('보고서 영역을 찾을 수 없습니다');return;}
+  const s=state.rptStart;const e=state.rptEnd;
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(`<!DOCTYPE html><html lang="ko"><head>
+  <meta charset="UTF-8">
+  <title>넉살FC 회비관리내역</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Noto Sans KR',sans-serif;font-size:13px;color:#111;padding:20px 30px}
+    .print-title{text-align:center;font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-1px}
+    .print-period{text-align:center;font-size:12px;color:#666;margin-bottom:16px}
+    .print-date{text-align:right;font-size:11px;color:#999;margin-bottom:20px}
+    h3{font-size:13px;font-weight:700;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid #1b6b2e;display:inline-block}
+    .rpt-sec{margin-bottom:20px}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;table-layout:fixed}
+    col:nth-child(1){width:30%}col:nth-child(2){width:45%}col:nth-child(3){width:25%}
+    thead th{background:#f0f0e8;padding:5px 6px;text-align:left;font-weight:600;border-bottom:1px solid #ccc}
+    tbody td{padding:4px 6px;border-bottom:1px solid #eee}
+    .rpt-total td{background:#f8f8f0;font-weight:700}
+    .rpt-grand td{background:#0e3d19;color:#fff;font-weight:700;padding:6px}
+    .amt-in{color:#1b6b2e;font-weight:700}
+    .amt-out{color:#c62828;font-weight:700}
+    .summary{margin-top:16px;border:1px solid #ddd;border-radius:6px;overflow:hidden}
+    .summary tr td{padding:7px 10px;font-weight:700}
+    @media print{body{padding:10px 20px}}
+  </style>
+  </head><body>
+  <div class="print-title">넉살FC 회비관리내역</div>
+  <div class="print-period">보고 기간: ${s} ~ ${e}</div>
+  <div class="print-date">출력일: ${new Date().toLocaleDateString('ko-KR')}</div>
+  ${content.innerHTML}
+  </body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.print();},600);
+}
+
+
+// ============================================================
+// 셀 더블클릭 인라인 수정
+// ============================================================
+function editCell(e, idx, field){
+  const td=e.currentTarget;
+  if(td.querySelector('input,select'))return; // 이미 편집중
+  const row=BANK_DATA[idx];
+  if(!row)return;
+  const cur=field==='amount'?Math.abs(row.amount):row[field];
+
+  let el;
+  if(field==='category'){
+    const cats=[...new Set(BANK_DATA.map(t=>t.category))];
+    el=document.createElement('select');
+    el.style.cssText='width:100%;font-size:.8rem;border:1px solid var(--primary);border-radius:3px;padding:.1rem';
+    cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===cur)o.selected=true;el.appendChild(o);});
+  } else {
+    el=document.createElement('input');
+    el.type=(field==='amount')?'number':'text';
+    el.value=cur||'';
+    el.style.cssText='width:100%;font-size:.8rem;border:1px solid var(--primary);border-radius:3px;padding:.1rem .3rem;box-sizing:border-box';
+  }
+
+  const origText=td.innerHTML;
+  td.innerHTML='';
+  td.appendChild(el);
+  el.focus();
+  if(el.select)el.select();
+
+  const commit=()=>{
+    let val=el.value.trim();
+    if(field==='amount'){
+      const newAbs=parseInt(val)||0;
+      const sign=row.amount>=0?1:-1;
+      row.amount=newAbs*sign;
+      // 잔액 재계산
+      let bal=idx>0?BANK_DATA[idx-1].balance:0;
+      for(let i=idx;i<BANK_DATA.length;i++){
+        BANK_DATA[i].balance=bal+BANK_DATA[i].amount;
+        bal=BANK_DATA[i].balance;
+      }
+    } else {
+      row[field]=val;
+    }
+    render();
+  };
+  const cancel=()=>{td.innerHTML=origText;};
+  el.addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'){ev.preventDefault();commit();}
+    if(ev.key==='Escape'){cancel();}
+  });
+  el.addEventListener('blur',commit);
+  // select는 change로 즉시 확정
+  if(field==='category')el.addEventListener('change',commit);
+}
+
+// ============================================================
+// 예산보고서 이미지 복사
+// ============================================================
+function copyReport(){
+  const target=document.getElementById('reportPrintArea');
+  if(!target){showToast('보고서 영역을 찾을 수 없습니다');return;}
+  if(typeof html2canvas==='undefined'){showToast('라이브러리 로딩 중...');return;}
+  showToast('캡처 중...');
+  html2canvas(target,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
+    canvas.toBlob(blob=>{
+      try{
+        navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>showToast('📋 클립보드에 복사됐어요! 카톡에 붙여넣기 하세요'));
+      }catch(e){
+        // fallback: 다운로드
+        const a=document.createElement('a');
+        a.download='넉살FC_예산보고서.png';
+        a.href=canvas.toDataURL('image/png');
+        a.click();
+        showToast('클립보드 불가 → 이미지로 다운로드했어요');
+      }
+    });
+  });
+}
+
+
+function render(){
+  const stats=getStats();
+  const tabs=[
+    {id:'bank',label:'📋 통장내역'},
+    {id:'dues',label:'💰 회비현황'},
+    {id:'report',label:'📊 예산보고서'},
+    {id:'members',label:'👥 회원관리'},
+    {id:'jersey',label:'🔢 등번호'},
+  ];
+
+  let pageContent='';
+  if(state.tab==='bank')pageContent=renderBankPage();
+  else if(state.tab==='dues')pageContent=renderDuesPage();
+  else if(state.tab==='report')pageContent=renderReportPage();
+  else if(state.tab==='members')pageContent=renderMembersPage();
+  else if(state.tab==='jersey')pageContent=renderJerseyPage();
+
+  document.getElementById('app').innerHTML=`
+    <header class="header">
+      <h1>&#9917; <span class="fc">넉살</span> 통장관리</h1>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.35rem">
+        ${renderGsButtons()}
+      </div>
+    </header>
+    <nav class="tabs">${tabs.map(t=>`<button class="tab ${state.tab===t.id?'on':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('')}</nav>
+    <main class="main">${pageContent}</main>`;
+
+  if(state.tab==='report')renderChart();
+}
+
+function renderChart(){
+  const canvas=document.getElementById('monthChart');
+  if(!canvas||typeof Chart==='undefined')return;
+  const data=getMonthlyChart();
+  new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels:MONTHS,
+      datasets:[
+        {label:'입금',data:data.map(d=>d.inc),backgroundColor:'rgba(27,107,46,0.6)',borderRadius:4},
+        {label:'출금',data:data.map(d=>d.exp),backgroundColor:'rgba(198,40,40,0.5)',borderRadius:4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{family:'Noto Sans KR',size:12}}}},
+      scales:{
+        y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'#f0ede5'}},
+        x:{ticks:{font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ============================================================
+// GOOGLE APPS SCRIPT (GAS) 연동
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyt7kHEt3y6bOTnnoGk6FVVzi1fjrma-HCMYXKhdUwZ7U7nt3nkdkGbNZRgPidIjYpl/exec';
+const APP_PASSWORD = '880424';
+let _gsConnected = false;
+let _accessToken = false;
+
+// ── GAS 호출 공통 (GET) — 프리즈마와 동일 패턴
+async function gasGet(action) {
+  const resp = await fetch(GAS_URL + '?action=' + encodeURIComponent(action));
+  const data = await resp.json();
+  if (!data.ok) throw new Error(data.msg || '알 수 없는 오류');
+  return data;
+}
+
+// ── GAS 호출 공통 (POST) — 원래 방식 복구
+async function gasPost(action, body) {
+  const payload = JSON.stringify({ action, ...body });
+  try {
+    const resp = await fetch(GAS_URL, {
+      method: 'POST',
+      body: payload,
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.msg || '알 수 없는 오류');
+    return data;
+  } catch(e) {
+    await fetch(GAS_URL, { method: 'POST', body: payload, mode: 'no-cors' });
+    return { ok: true, msg: '저장 요청 전송됨' };
+  }
+}
+
+// ── 등번호 전용 GET 저장 (데이터 작아서 URL에 담기 가능)
+async function gasGetSave(action, body) {
+  const jsonBody = JSON.stringify({ action, ...body });
+  const url = GAS_URL + '?action=' + encodeURIComponent(action) + '&payload=' + encodeURIComponent(jsonBody);
+  const resp = await fetch(url);
+  const data = await resp.json();
+  if (!data.ok) throw new Error(data.msg || '알 수 없는 오류');
+  return data;
+}
+
+// ── 전체 불러오기 (action=load 한 방에)
+async function loadAllFromSheets() {
+  showLoading('📥 구글 시트에서 데이터를 불러오는 중...');
+  try {
+    const data = await gasGet('load');
+
+    // bankbook
+    BANK_DATA.length = 0;
+    (data.bankbook || []).forEach(r => {
+      if (!r[0]) return;
+      // 숫자 파싱: GAS에서 숫자/문자열/₩포맷 모두 처리
+      const n = v => {
+        if (v === null || v === undefined || v === '') return 0;
+        if (typeof v === 'number') return Math.round(v); // float 대응
+        const s = String(v).replace(/[₩,\s]/g, '').replace(/[^0-9\-]/g, '');
+        return parseInt(s) || 0;
+      };
+      BANK_DATA.push({
+        date: String(r[0]||''), amount: n(r[1]), payer: String(r[2]||''),
+        category: String(r[3]||''), content: String(r[4]||''),
+        note: String(r[5]||''), balance: n(r[6])
+      });
+    });
+
+    // memberManagement
+    // 컬럼: 순번(0) | 구분(1) | 직책(2) | 이름(3) | 등번호(4) | Year(5) | 나이(6) | 연락처(7) | 상세상태(8) | m1~m12(9~20)
+    MEMBER_DATA.length = 0;
+    const pg = {'회장':0,'부회장':1,'감독':2,'고문':3,'총무':4,'부총무':4,'간사':4,'코치':5,'회원':6};
+    (data.memberManagement || []).forEach(r => {
+      if (!r[3]) return;
+      const pos = String(r[2]||'회원');
+      const statusRaw = String(r[8]||'').trim();
+      const obj = {
+        group: pg[pos]??6, position: pos, name: String(r[3]||''),
+        jersey: parseInt(r[4])||0, year: parseInt(r[5])||'',
+        age: parseInt(r[6])||'', contact: String(r[7]||''),
+        status: statusRaw,   // 상세상태 (정상/부상/군대/해외출장/육아/파견 등)
+        annual_date: '',
+      };
+      for (let i=1;i<=12;i++) obj['m'+i] = String(r[9+i-1]||'');  // m1~m12 는 9번째(index 8+1)부터
+      MEMBER_DATA.push(obj);
+    });
+
+    // BackNumber — state 저장 + MEMBER_DATA 등번호 덮어쓰기
+    state.backNumbers = (data.backNumber || []).filter(r=>r[0]&&r[1]!=='').map(r=>({
+      name: String(r[0]||'').trim(),
+      jersey: parseInt(r[1])||0
+    }));
+    state.backNumbers.forEach(bn => {
+      const cleanName = bn.name.replace(/\(\d+\)/,'').trim();
+      const m = MEMBER_DATA.find(m => m.name === cleanName || m.name === bn.name);
+      if (m) m.jersey = bn.jersey;
+    });
+
+    // DonationOfGoods
+    state.donations = (data.donation || []).filter(r=>r[0]).map(r=>({
+      date: String(r[0]||''), name: String(r[1]||''), content: String(r[2]||'')
+    }));
+
+    // ── BANK_DATA → m1~m12 자동 계산
+    calcDuesFromBank();
+
+    // ── 비활동 회원 group 재할당 (Sheets에서는 직책 기반으로만 group 할당되므로)
+    MEMBER_DATA.forEach(m => {
+      if (m.group < 7 && isInactiveMember(m)) m.group = 7;
+    });
+
+    _gsConnected = true;
+    _accessToken = true;
+    hideLoading();
+    render();
+    showToast('✅ 동기화 완료!');
+  } catch(e) {
+    console.error(e);
+    hideLoading();
+    showLoadError(e.message);
+  }
+}
+
+// ============================================================
+// BANK_DATA → 회원별 m1~m12 자동 계산
+// ============================================================
+function calcDuesFromBank() {
+  // 먼저 모든 회원 m1~m12 초기화
+  MEMBER_DATA.forEach(m => {
+    // 비활동 회원은 건드리지 않음
+    if (isInactiveMember(m)) return;
+    for (let i = 1; i <= 12; i++) {
+      if (!m['m'+i]) m['m'+i] = '';
+    }
+  });
+
+  // 회비/연납/가입비 거래만 필터
+  const duesTx = BANK_DATA.filter(t =>
+    t.amount >= 0 &&
+    (t.category === '회비' || t.category === '연납' ||
+    t.category === '가입비' ||
+    (t.content && t.content.includes('연납')))
+  );
+
+  duesTx.forEach(t => {
+    const member = MEMBER_DATA.find(m => m.name === t.payer);
+    if (!member || isInactiveMember(member)) return;
+
+    const txMonth = parseInt(t.date.split('.')[1]); // 거래 월
+    const txDay   = parseInt(t.date.split('.')[2]);  // 거래 일
+
+    // ── 연납 처리
+    const isAnnual = t.category === '연납' || (t.content && t.content.includes('연납'));
+    if (isAnnual) {
+      member.m1 = '연납';
+      if (!member.annual_date) member.annual_date = t.date.replace(/\./g, '-');
+      return;
+    }
+
+    // ── 가입비 처리: 20일 이하 → 당월, 21일 이상 → 다음달
+    if (t.category === '가입비') {
+      const targetMonth = txDay <= 20 ? txMonth : (txMonth % 12) + 1;
+      const key = 'm' + targetMonth;
+      if (!member[key] || member[key] === '') member[key] = 'O';
+      return;
+    }
+
+    // ── 회비 처리: content에서 납부 월 파싱
+    // content 예시: "1월", "2월", "1,2월", "1월,2월", "2월,4월 / 3월 파견", "2. 3월"
+    const content = t.content || '';
+    const months = parseMonthsFromContent(content, txMonth);
+
+    months.forEach(mo => {
+      if (mo < 1 || mo > 12) return;
+      const key = 'm' + mo;
+      // 파견/특수 상태 파싱 (예: "3월 파견")
+      const special = parseSpecialFromContent(content, mo);
+      if (special) {
+        member[key] = special;
+      } else if (!member[key] || member[key] === '') {
+        member[key] = 'O';
+      }
+    });
+  });
+}
+
+// content에서 납부 월 숫자 배열 추출 — 유연한 파싱
+// 처리 가능한 형식:
+//   "1월"  "2월"  "3월"
+//   "1,2월"  "1, 2월"  "1.2월"  "1·2월"
+//   "1월,2월"  "1월 2월"  "1월/2월"
+//   "2. 3월"  "2.3월"  "1~3월" (범위)
+//   "2월,4월 / 3월 파견"
+//   숫자만: "1"  "12"
+function parseMonthsFromContent(content, fallbackMonth) {
+  if (!content || content.trim() === '' || content === '-') return [fallbackMonth];
+
+  const months = new Set();
+
+  // 특수문자(구분자)를 공백으로 정규화: , . · / | ~ 등 → 공백
+  // 단, 숫자 사이의 구분자만 처리 (날짜 포맷의 점과 구분)
+  const normalized = content
+    .replace(/[,，、·・\/\\|]/g, ' ')  // 쉼표·슬래시 등 → 공백
+    .replace(/(\d)\s*\.\s*(\d)/g, '$1 $2')  // 숫자.숫자 → 숫자 숫자
+    .replace(/(\d)\s*~\s*(\d)/g, (_, a, b) => {  // 범위: 1~3 → 1 2 3
+      const result = [];
+      for (let i = parseInt(a); i <= parseInt(b); i++) result.push(i);
+      return result.join(' ');
+    });
+
+  // 모든 숫자 추출
+  const numMatches = normalized.match(/\d+/g);
+  if (numMatches) {
+    numMatches.forEach(n => {
+      const num = parseInt(n);
+      if (num >= 1 && num <= 12) months.add(num);
+    });
+  }
+
+  if (months.size === 0) return [fallbackMonth];
+  return [...months];
+}
+
+// content에서 특정 월의 특수 상태 파싱 (파견 등)
+function parseSpecialFromContent(content, month) {
+  const specials = ['파견', '부상', '군대', '해외출장', '육아'];
+  for (const sp of specials) {
+    if (!content.includes(sp)) continue;
+    // "N월 파견" 또는 "N파견" 형태로 해당 월과 특수상태가 같이 있는지 확인
+    const monthStr = String(month);
+    const idx = content.indexOf(sp);
+    // 특수상태 앞 5글자 안에 해당 월 숫자가 있으면 매칭
+    const before = content.slice(Math.max(0, idx - 5), idx);
+    if (before.includes(monthStr)) return sp;
+    // 특수상태 뒤 3글자 안에 해당 월 숫자가 있어도 매칭
+    const after = content.slice(idx + sp.length, idx + sp.length + 3);
+    if (after.includes(monthStr)) return sp;
+  }
+  return null;
+}
+
+// ── bankbook 저장
+async function saveBankbookToSheet() {
+  showToast('📤 통장내역 저장 중...');
+  try {
+    const rows = BANK_DATA.map(r=>[r.date,r.amount,r.payer,r.category,r.content,r.note,r.balance]);
+    const res = await gasPost('saveBank', { rows });
+    showToast('✅ ' + res.msg);
+  } catch(e) { showToast('❌ 저장 실패: ' + e.message); }
+}
+
+// ── memberManagement 저장
+async function saveMembersToSheet() {
+  showToast('📤 회원 정보 저장 중...');
+  try {
+    // GAS 시트 정렬: 이름(D열) 오름차순 → 구분(B열) 오름차순
+    const sorted = [...MEMBER_DATA].sort((a,b)=>{
+      const nc = a.name.localeCompare(b.name,'ko');
+      if(nc!==0) return nc;
+      return a.group - b.group;
+    });
+    const rows = sorted.map((m,i) => {
+      // 컬럼: 순번|구분|직책|이름|등번호|Year|나이|연락처|상세상태|m1~m12
+      const statusVal = m.status && m.status !== '정상' ? m.status : (m.group>=7 ? getInactiveReason(m) : '정상');
+      const r = [i+1, m.group, m.position, m.name, m.jersey, m.year, m.year?calcAge(m.year):'', m.contact, statusVal];
+      for (let n=1;n<=12;n++) r.push(m['m'+n]||'');
+      return r;
+    });
+    const res = await gasPost('saveMembers', { rows });
+    showToast('✅ ' + res.msg);
+  } catch(e) { showToast('❌ 저장 실패: ' + e.message); }
+}
+
+// ── 헤더 버튼
+function renderGsButtons() {
+  return `
+    <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+      <button class="btn btn-sm" style="background:#34a853;color:#fff" onclick="loadAllFromSheets()">🔄 새로고침</button>
+      <button class="btn btn-sm" style="background:#fbbc04;color:#000" onclick="saveCurrentToSheet()">💾 저장</button>
+    </div>`;
+}
+
+function saveCurrentToSheet() {
+  if (state.tab === 'bank') saveBankbookToSheet();
+  else if (state.tab === 'members') saveMembersToSheet();
+  else if (state.tab === 'jersey') saveJerseyToSheet();
+  else showToast('통장내역, 회원관리, 등번호 탭에서 저장해주세요');
+}
+
+
+// ============================================================
+// 로딩 화면
+// ============================================================
+function showLoading(msg) {
+  let el = document.getElementById('loadingScreen');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loadingScreen';
+    el.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg,#0e3d19,#1b6b2e);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;gap:1.2rem';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div style="font-size:2.5rem">⚽</div>
+    <div style="font-size:1.1rem;font-weight:700;letter-spacing:-.5px">넉살 FC</div>
+    <div style="font-size:.85rem;opacity:.8">${msg}</div>
+    <div style="width:180px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden;margin-top:.5rem">
+      <div style="height:100%;background:#ffd54f;border-radius:4px;animation:ldbar 1.6s ease-in-out infinite"></div>
+    </div>
+    <style>@keyframes ldbar{0%{width:0%}50%{width:80%}100%{width:100%}}</style>`;
+  el.style.display = 'flex';
+}
+
+function hideLoading() {
+  const el = document.getElementById('loadingScreen');
+  if (el) el.style.display = 'none';
+}
+
+function showLoadError(msg) {
+  const el = document.getElementById('loadingScreen');
+  if (el) el.innerHTML = `
+    <div style="font-size:2rem">⚠️</div>
+    <div style="font-size:1rem;font-weight:700">연결 실패</div>
+    <div style="font-size:.8rem;opacity:.8;text-align:center;max-width:280px">${msg}</div>
+    <button onclick="loadAllFromSheets()" style="margin-top:.5rem;padding:.5rem 1.2rem;background:#ffd54f;color:#0e3d19;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.85rem">다시 시도</button>`;
+}
+
+// ============================================================
+// 비밀번호 화면
+// ============================================================
+function showPasswordScreen() {
+  document.getElementById('app').innerHTML = `
+    <div style="min-height:100vh;background:linear-gradient(135deg,#0e3d19 0%,#1b6b2e 60%,#2e7d32 100%);display:flex;align-items:center;justify-content:center;padding:1.5rem">
+      <div style="background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:340px;box-shadow:0 8px 40px rgba(0,0,0,.25);text-align:center">
+        <div style="font-size:3rem;margin-bottom:.5rem">⚽</div>
+        <div style="font-size:1.4rem;font-weight:800;letter-spacing:-1px;color:#0e3d19;margin-bottom:.2rem">넉살 FC</div>
+        <div style="font-size:.82rem;color:#888;margin-bottom:2rem">통장 관리 시스템</div>
+        <div style="text-align:left;margin-bottom:1.2rem">
+          <label style="font-size:.75rem;font-weight:600;color:#555;display:block;margin-bottom:.4rem">🔒 비밀번호</label>
+          <input id="pwInput" type="password" placeholder="비밀번호를 입력하세요"
+            style="width:100%;padding:.7rem .9rem;border:2px solid #e2dfda;border-radius:8px;font-size:1rem;font-family:inherit;outline:none;letter-spacing:.2rem;transition:.2s;box-sizing:border-box"
+            onkeydown="if(event.key==='Enter')checkPassword()"
+            onfocus="this.style.borderColor='#1b6b2e'"
+            onblur="this.style.borderColor='#e2dfda'">
+          <div id="pwError" style="color:#c62828;font-size:.75rem;margin-top:.4rem;display:none">❌ 비밀번호가 틀렸습니다</div>
+        </div>
+        <button onclick="checkPassword()"
+          style="width:100%;padding:.75rem;background:linear-gradient(135deg,#0e3d19,#1b6b2e);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-.3px">
+          입장하기
+        </button>
+        <div style="font-size:.7rem;color:#bbb;margin-top:1.2rem">넉살FC 관리자 전용</div>
+      </div>
+    </div>`;
+  // 자동 포커스
+  setTimeout(() => { const el = document.getElementById('pwInput'); if (el) el.focus(); }, 100);
+}
+
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === APP_PASSWORD) {
+    sessionStorage.setItem('nukssal_auth', '1');
+    // #app을 비워서 render()가 비밀번호 화면을 다시 그리지 않게 함
+    document.getElementById('app').innerHTML = '';
+    showLoading('구글 시트에 접속 중...');
+    loadAllFromSheets();
+  } else {
+    const err = document.getElementById('pwError');
+    err.style.display = 'block';
+    const inp = document.getElementById('pwInput');
+    inp.value = '';
+    inp.style.borderColor = '#c62828';
+    inp.focus();
+    setTimeout(() => { inp.style.borderColor = '#e2dfda'; }, 1500);
+  }
+}
+
+// ── 앱 초기화
+function initApp() {
+  if (sessionStorage.getItem('nukssal_auth') === '1') {
+    showLoading('구글 시트에 접속 중...');
+    loadAllFromSheets();
+  } else {
+    showPasswordScreen();
+  }
+}
+
+// Load Chart.js then init
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+script.onload = () => initApp();
+script.onerror = () => initApp();
+document.head.appendChild(script);
+
+</script>
+</body>
+</html>
