@@ -190,7 +190,7 @@ function showToast(msg,dur=2800){
 // ============================================================
 // STATE
 // ============================================================
-let state={tab:'bank',search:'',catFilter:'전체',monthFilter:'전체',rptStart:'2026-01-01',rptEnd:'2026-03-10',memberSubTab:'active',memberSort:'seq',bankSort:'desc',backNumbers:[],donations:[]};
+let state={tab:'bank',search:'',catFilter:'전체',monthFilter:'전체',rptStart:'2026-01-01',rptEnd:new Date().toISOString().slice(0,10),memberSubTab:'active',memberSort:'seq',bankSort:'desc',backNumbers:[],donations:[]};
 
 // 검색: keyup에서만 실행, 한글 조합중(composing)엔 완전히 무시
 let _isComposing=false;
