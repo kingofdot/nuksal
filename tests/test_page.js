@@ -160,6 +160,24 @@ const test = `
   state.memberSubTab = 'withdrawn'; state.tab = 'members'; render();
   openMemberModal(0); openJerseyPicker(10);
   ok(true, '통장·회비·보고서·회원(재적/탈퇴)·등번호 탭 + 회원 수정·번호 배정 창');
+
+  console.log('⑪ 회원 추가·수정 창 등번호 칸 → 1~99 표에서 고르기');
+  let gridHtml = '';
+  const realCreate = document.createElement;
+  document.createElement = () => { const e = realCreate(); Object.defineProperty(e, 'innerHTML', { set(v) { gridHtml = v; }, get() { return gridHtml; } }); return e; };
+  __elements['mm_jersey'] = { value: '10' };
+  const idxB2 = MEMBER_DATA.indexOf(byName('가상B'));
+  openJerseyGrid(idxB2);
+  document.createElement = realCreate;
+  ok((gridHtml.match(/pickJerseyFromGrid\\([1-9]\\d*\\)/g) || []).length === 99 && /pickJerseyFromGrid\\(0\\)/.test(gridHtml), '1~99 칸 99개 + 번호 없음 버튼');
+  ok(/title="10번 · 비어 있음"/.test(gridHtml), '수정 중인 본인 번호(10)는 남의 번호로 안 보임');
+  ok(/title="22번 · 가상G"/.test(gridHtml), '다른 회원 번호(22)에는 이름이 보임');
+  pickJerseyFromGrid(22);
+  ok(__elements['mm_jersey'].value === 22, '칸을 누르면 입력칸에 그 번호가 들어감');
+  pickJerseyFromGrid(0);
+  ok(__elements['mm_jersey'].value === '', '번호 없음 → 입력칸 비움');
+  openJerseyGrid(null);
+  ok(true, '새 회원(인덱스 없음)으로도 열림');
   console.log('\\n통과 ' + n + '개');
 })().catch(e => { console.error(e.stack || e); process.exitCode = 1; });
 `;

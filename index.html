@@ -738,7 +738,7 @@ function openMemberModal(idx=null){
       <div class="modal-bd">
         <div class="form-row">
           <div class="fg" style="flex:1"><label>이름 *</label><input id="mm_name" value="${m.name}" placeholder="이름"></div>
-          <div class="fg" style="flex:1"><label>등번호</label><input id="mm_jersey" type="number" value="${m.jersey||''}"></div>
+          <div class="fg" style="flex:1"><label>등번호</label><input id="mm_jersey" type="number" value="${m.jersey||''}" readonly placeholder="눌러서 고르기" style="cursor:pointer" onclick="openJerseyGrid(${isEdit?idx:'null'})"></div>
         </div>
         <div class="form-row">
           <div class="fg" style="flex:1"><label>직책</label>
@@ -813,6 +813,51 @@ function saveMember(idx){
   }
   document.getElementById('memberModalOverlay').remove();
   render();
+}
+
+// 회원 추가·수정 창의 등번호 칸 → 1~99 표에서 고른다.
+// 고른 값은 입력칸에만 넣는다. 다른 회원 번호를 골랐으면 저장할 때 saveMember 가 그 회원 번호를 비울지 묻는다.
+function openJerseyGrid(idx){
+  const old=document.getElementById('jerseyGridOverlay');if(old)old.remove();
+  const self=(idx===null||idx===undefined)?null:MEMBER_DATA[idx];
+  const map=jerseyHolders();
+  const cur=parseInt(document.getElementById('mm_jersey').value)||0;
+  const overlay=document.createElement('div');
+  overlay.className='modal-bg';overlay.id='jerseyGridOverlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};
+  const cell=n=>{
+    const who=(map[n]||[]).filter(o=>o!==self).map(o=>o.name).join(', ');
+    const isCur=n===cur;
+    const bg=isCur?'var(--primary)':who?'#f1f1ee':'#fff';
+    return `<button type="button" onclick="pickJerseyFromGrid(${n})" title="${n}번 · ${who||'비어 있음'}"
+      style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:44px;padding:.2rem .1rem;border:1px solid ${isCur?'var(--primary)':'#e6e6e0'};border-radius:6px;background:${bg};cursor:pointer;font:inherit">
+      <span style="font-size:.85rem;font-weight:700;line-height:1;color:${isCur?'#fff':who?'var(--text3)':'var(--primary)'}">${n}</span>
+      <span style="font-size:.6rem;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${isCur?'#fff':'var(--text3)'}">${isCur?'선택':who}</span>
+    </button>`;
+  };
+  const swatch=bg=>`<span style="display:inline-block;width:.75rem;height:.75rem;border:1px solid #e6e6e0;border-radius:3px;background:${bg};vertical-align:-1px"></span>`;
+  overlay.innerHTML=`
+    <div class="modal" style="max-width:600px;width:100%;max-height:92vh;display:flex;flex-direction:column">
+      <div class="modal-hd"><h3>등번호 고르기</h3><button class="modal-x" onclick="document.getElementById('jerseyGridOverlay').remove()">✕</button></div>
+      <div class="modal-bd" style="overflow:auto">
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem .9rem;font-size:.72rem;color:var(--text2);margin-bottom:.6rem">
+          <span>${swatch('#fff')} 빈 번호</span>
+          <span>${swatch('var(--primary)')} 지금 고른 번호</span>
+          <span>${swatch('#f1f1ee')} 다른 회원 번호 (고르면 저장할 때 그 회원 번호를 비울지 물어봐요)</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px">${Array.from({length:99},(_,i)=>cell(i+1)).join('')}</div>
+      </div>
+      <div class="modal-ft" style="justify-content:space-between">
+        <button class="btn btn-sm" style="background:var(--danger-light);color:var(--danger)" onclick="pickJerseyFromGrid(0)">번호 없음</button>
+        <button class="btn btn-o" onclick="document.getElementById('jerseyGridOverlay').remove()">닫기</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function pickJerseyFromGrid(n){
+  document.getElementById('mm_jersey').value=n||'';
+  const ov=document.getElementById('jerseyGridOverlay');if(ov)ov.remove();
 }
 
 function withdrawMember(idx){
